@@ -1,8 +1,8 @@
 fx_version 'cerulean'
 game 'gta5'
 
-name "SickLockersQBCore"
-description "A locker/evidence storage using ox_libs and inventory"
+name "SickLockers"
+description "A locker/evidence storage using ox_libs and inventory for ESX/QBCore"
 author "SickJuggalo666"
 version "1.0.0"
 lua54 'yes'
