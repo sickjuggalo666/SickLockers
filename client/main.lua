@@ -4,6 +4,7 @@ local pedspawned = false
 local PlayerData = {}
 local evidenceNpc = nil
 
+
 if Config.Framework == 'ESX' then
 	Core = exports['es_extended']:getSharedObject()
 elseif Config.Framework == 'QBCore' then
@@ -24,10 +25,37 @@ elseif Config.Framework == 'QBCore' then
 	RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
 		PlayerData = Core.Functions.GetPlayerData()
 	end)
-	
+
 	RegisterNetEvent('QBCore:Client:OnJobUpdate',function(JobInfo)
 		PlayerData.job = JobInfo
 	end)
+end
+
+local function Notify(type,title, message)
+    if title == nil then title = "Lockers" end
+    if Config.NotificationType.Client == 'libs' then
+            if type == 1 then
+                lib.notify({
+                    title = title,
+                    description = message,
+                    type = 'success'
+                })
+            elseif type == 2 then
+                lib.notify({
+                    title = title,
+                    description = message,
+                    type = 'inform'
+                })
+            elseif type == 3 then
+                lib.notify({
+                    title = title,
+                    description = message,
+                    type = 'error'
+                })
+            end
+    elseif Config.NotificationType.Client == 'custom' then
+
+    end
 end
 
 
@@ -47,10 +75,10 @@ Citizen.CreateThread(function()
 				RequestModel(hash)
 				Wait(10)
 			end
-			while not HasModelLoaded(hash) do 
+			while not HasModelLoaded(hash) do
 				Wait(10)
 			end
-	
+
 			pedspawned = true
 			evidenceNpc = CreatePed(5, hash, v.coords, v.h, false, false)
 			SetBlockingOfNonTemporaryEvents(evidenceNpc, true)
@@ -60,7 +88,6 @@ Citizen.CreateThread(function()
 			SetPedCanBeTargetted(evidenceNpc, false)
 			SetEntityInvincible(evidenceNpc, true)
 			FreezeEntityPosition(evidenceNpc, true)
-			lib.requestAnimDict("amb@world_human_cop_idles@male@idle_b", 100)
 		end
 	end
 end)
@@ -86,7 +113,7 @@ Citizen.CreateThread(function()
 							TriggerEvent('SickEvidence:openInventory', false)
 						end
 					},
-					{
+					--[[{
 						name = 'evidence_heist',
 						icon = 'fa-solid fa-cube',
 						label = 'Hack Evidence',
@@ -99,7 +126,7 @@ Citizen.CreateThread(function()
 						onSelect = function()
 							TriggerEvent('SickEvidence:openInventory', true)
 						end
-					}
+					}]]
 				}
 			})
 		elseif Config.Target == 'qtarget' then
@@ -119,7 +146,7 @@ Citizen.CreateThread(function()
                 },
 				job = {v.job},
                 distance = 2.5
-            })  
+            })
 		elseif Config.Target == 'qb-target' then
 			exports[Config.Target]:AddBoxZone("evidence_Lockers", vector3(v.coords.x,v.coords.y,v.coords.z), 3, 2, {
                 name = 'evidence_Lockers',
@@ -139,7 +166,7 @@ Citizen.CreateThread(function()
 				},
 				distance = 2.5
 			})
-			
+
 		end
 	end
 end)
@@ -189,7 +216,7 @@ lib.registerContext({
 	},
 })
 
-lib.registerContext({
+--[[lib.registerContext({
 	id = 'openHeistInv',
 	title = 'Evidence Lockers!',
 	options = {
@@ -200,7 +227,7 @@ lib.registerContext({
 			event = 'SickEvidence:OpenHeistMenu',
 		}
 	},
-})
+})]] -- COMING SOON
 
 RegisterNetEvent('SickEvidence:openInventory')
 AddEventHandler('SickEvidence:openInventory',function(isHeist)
@@ -253,15 +280,15 @@ AddEventHandler('SickEvidence:confirmorcancel',function(args)
 	end
 end)
 
-RegisterNetEvent('SickEvidence:OpenHeistMenu')
+--[[RegisterNetEvent('SickEvidence:OpenHeistMenu')
 AddEventHandler('SickEvidence:OpenHeistMenu', function()
 	local input = lib.inputDialog('LSPD Evidence', {'Incident Number (#...)'})
 
-	if not input then 
+	if not input then
 		lib.hideContext(false)
-		return 
+		return
 	end
-	local evidenceID = ("Case :"..input[1]) --("Case: "..input[1])
+	local evidenceID = ("Case: "..input[1]) --("Case :"..input[1]) -- if you have issues when updating.. changed format cause it just looks better
 	print(evidenceID)
 	local exists = lib.callback.await('SickEvidence:getInventory', 1000, evidenceID)
 	print(exists)
@@ -289,81 +316,151 @@ AddEventHandler('SickEvidence:OpenHeistMenu', function()
 		})
 		lib.showContext('evidenceOption')
 	end
-end)
+end)]] -- COMING SOON
 
 RegisterNetEvent('SickEvidence:triggerEvidenceMenu')
 AddEventHandler('SickEvidence:triggerEvidenceMenu', function()
 	local input = lib.inputDialog('LSPD Evidence', {'Incident Number (#...)'})
 
-	if not input then 
+	if not input then
 		lib.hideContext(false)
-		return 
+		return
 	end
-	local evidenceID = ("Case :"..input[1])
-	local exists = lib.callback.await('SickEvidence:getInventory', 1000, evidenceID)
-	if not exists then
-		lib.registerContext({
-			id = 'confirmCreate',
-			title = 'Confirm or Cancel',
-			options = {
-				{
-					title = 'Create New Evidence Inventory?',
-					description = 'Evidence Inventory System'
-				},
-				{
-					title = 'Confirm Creation?',
-					description = 'Create an Evidence Storage?',
-					arrow = true,
-					event = 'SickEvidence:confirmorcancel',
-					args = {
-						selection = 'confirm', 
-						inventory = evidenceID
-					}
-				},
-				{
-					title = 'Cancel Creation?',
-					description = 'Cancel The Creation of this Evidence Storage?',
-					arrow = true,
-					event = 'SickEvidence:confirmorcancel',
-					args = {
-						selection = 'cancel'
-					}
-				}
-			},
-		})
-	
-		lib.showContext('confirmCreate')
-	else
-		lib.registerContext({
-			id = 'evidenceOption',
-			title = 'Evidence Options',
-			options = {
-				{
-					title = 'Evidence Delete/Open'
-				},
-				{
-					title = 'Open Evidence?',
-					description = 'Open Evidence Storage?',
-					arrow = true,
-					event = 'SickEvidence:evidenceOptions',
-					args = {
-						selection = "open",
-						inventory = evidenceID
-					}
-				},
-				{
-					title = 'Delete Inventory?',
-					description = 'Delete this Evidence Storage?',
-					arrow = true,
-					event = 'SickEvidence:evidenceOptions',
-					args = {
-						selection = "delete",
-						inventory = evidenceID
-					}
-				}
-			},
-		})
-		lib.showContext('evidenceOption')
+	local evidenceID = ("Case: "..input[1]) --("Case :"..input[1]) -- if you have issues when updating.. changed format cause it just looks better
+	if Config.Framework == 'ESX' then
+		Core.TriggerServerCallback('SickEvidence:getInventory', function(exists)
+			if not exists then
+				lib.registerContext({
+					id = 'confirmCreate',
+					title = 'Confirm or Cancel',
+					options = {
+						{
+							title = 'Create New Evidence Inventory?',
+							description = 'Evidence Inventory System'
+						},
+						{
+							title = 'Confirm Creation?',
+							description = 'Create an Evidence Storage?',
+							arrow = true,
+							event = 'SickEvidence:confirmorcancel',
+							args = {
+								selection = 'confirm',
+								inventory = evidenceID
+							}
+						},
+						{
+							title = 'Cancel Creation?',
+							description = 'Cancel The Creation of this Evidence Storage?',
+							arrow = true,
+							event = 'SickEvidence:confirmorcancel',
+							args = {
+								selection = 'cancel'
+							}
+						}
+					},
+				})
+		
+				lib.showContext('confirmCreate')
+			else
+				lib.registerContext({
+					id = 'evidenceOption',
+					title = 'Evidence Options',
+					options = {
+						{
+							title = 'Evidence Delete/Open'
+						},
+						{
+							title = 'Open Evidence?',
+							description = 'Open Evidence Storage?',
+							arrow = true,
+							event = 'SickEvidence:evidenceOptions',
+							args = {
+								selection = "open",
+								inventory = evidenceID
+							}
+						},
+						{
+							title = 'Delete Inventory?',
+							description = 'Delete this Evidence Storage?',
+							arrow = true,
+							event = 'SickEvidence:evidenceOptions',
+							args = {
+								selection = "delete",
+								inventory = evidenceID
+							}
+						}
+					},
+				})
+				lib.showContext('evidenceOption')
+			end
+		end,evidenceID)
+	elseif Config.Framework == 'QBCore' then
+		Core.Functions.TriggerCallback('SickEvidence:getInventory', function(exists)
+			if not exists then
+				lib.registerContext({
+					id = 'confirmCreate',
+					title = 'Confirm or Cancel',
+					options = {
+						{
+							title = 'Create New Evidence Inventory?',
+							description = 'Evidence Inventory System'
+						},
+						{
+							title = 'Confirm Creation?',
+							description = 'Create an Evidence Storage?',
+							arrow = true,
+							event = 'SickEvidence:confirmorcancel',
+							args = {
+								selection = 'confirm',
+								inventory = evidenceID
+							}
+						},
+						{
+							title = 'Cancel Creation?',
+							description = 'Cancel The Creation of this Evidence Storage?',
+							arrow = true,
+							event = 'SickEvidence:confirmorcancel',
+							args = {
+								selection = 'cancel'
+							}
+						}
+					},
+				})
+		
+				lib.showContext('confirmCreate')
+			else
+				lib.registerContext({
+					id = 'evidenceOption',
+					title = 'Evidence Options',
+					options = {
+						{
+							title = 'Evidence Delete/Open'
+						},
+						{
+							title = 'Open Evidence?',
+							description = 'Open Evidence Storage?',
+							arrow = true,
+							event = 'SickEvidence:evidenceOptions',
+							args = {
+								selection = "open",
+								inventory = evidenceID
+							}
+						},
+						{
+							title = 'Delete Inventory?',
+							description = 'Delete this Evidence Storage?',
+							arrow = true,
+							event = 'SickEvidence:evidenceOptions',
+							args = {
+								selection = "delete",
+								inventory = evidenceID
+							}
+						}
+					},
+				})
+				lib.showContext('evidenceOption')
+			end
+		end, evidenceID)
 	end
 end)
 
@@ -409,7 +506,7 @@ local function lockerOption(lockerID)
 				arrow = true,
 				event = 'SickEvidence:lockerOptions',
 				args = {
-					selection = 'open', 
+					selection = 'open',
 					inventory = lockerID
 				},
 				metadata = {
@@ -447,80 +544,157 @@ end)
 
 RegisterNetEvent('SickEvidence:lockerCallbackEvent')
 AddEventHandler('SickEvidence:lockerCallbackEvent', function()
-	local data = lib.callback.await('SickEvidence:getPlayerName', 1000)
-	if data then
-		local lockerID = ("LEO: "..data.firstname.." "..data.lastname)
-		local locker = lib.callback.await('SickEvidence:getLocker', 1000, lockerID)
-		if locker then
+	if Config.Framework == 'ESX' then
+		Core.TriggerServerCallback('SickEvidence:getPlayerName', function(data)
+			if data then
 				local lockerID = ("LEO: "..data.firstname.." "..data.lastname)
-				print(lockerID)
-				lib.registerContext({
-					id = 'lockerCreate',
-					title = 'Confirm or Cancel',
-					menu = 'openInventory',
-					options = {
-						{
-							title = 'Create New Locker?',
-							description = 'Locker Inventory System'
-						},
-						{
-							title = 'Confirm Creation?',
-							description = 'Create a Personal Locker?',
-							arrow = true,
-							event = 'SickEvidence:confirmLocker',
-							args = {selection = 'confirm', inventory = lockerID}
-						},
-						{
-							title = 'Cancel Creation?',
-							description = 'Cancel The Creation of this Personal Locker?',
-							arrow = true,
-							event = 'SickEvidence:confirmLocker',
-							args = {selection = 'cancel'}
-						}
-					},
-				})
-			
-				lib.showContext('lockerCreate')
-			else
-				local lockerID = ("LEO: "..data.firstname.." "..data.lastname)
-				lib.registerContext({
-					id = 'lockerOption',
-					title = 'Confirm or Cancel',
-					options = {
-						{
-							title = 'Locker Options',
-							description = 'Locker Delete/Open'
-						},
-						{
-							title = 'Open Locker?',
-							description = 'Open a Personal Locker?',
-							arrow = true,
-							event = 'SickEvidence:lockerOptions',
-							args = {
-								selection = 'open', 
-								inventory = lockerID
+				Core.TriggerServerCallback('SickEvidence:getLocker', function(locker)
+					if locker then
+						lib.registerContext({
+							id = 'lockerCreate',
+							title = 'Confirm or Cancel',
+							menu = 'openInventory',
+							options = {
+								{
+									title = 'Create New Locker?',
+									description = 'Locker Inventory System'
+								},
+								{
+									title = 'Confirm Creation?',
+									description = 'Create a Personal Locker?',
+									arrow = true,
+									event = 'SickEvidence:confirmLocker',
+									args = {selection = 'confirm', inventory = lockerID}
+								},
+								{
+									title = 'Cancel Creation?',
+									description = 'Cancel The Creation of this Personal Locker?',
+									arrow = true,
+									event = 'SickEvidence:confirmLocker',
+									args = {selection = 'cancel'}
+								}
 							},
-							metadata = {
-								{label = lockerID}
-							}
-						},
-						{
-							title = 'Delete Locker?',
-							description = 'Delete Your Personal Locker?',
-							arrow = true,
-							event = 'SickEvidence:confirmorcancel',
-							args = {
-								selection = "delete",
-								inventory = lockerID
-							}
-						}
-					},
-				})
-			
-				lib.showContext('lockerOption')
+						})
+
+						lib.showContext('lockerCreate')
+					else
+						lib.registerContext({
+							id = 'lockerOption',
+							title = 'Confirm or Cancel',
+							options = {
+								{
+									title = 'Locker Options',
+									description = 'Locker Delete/Open'
+								},
+								{
+									title = 'Open Locker?',
+									description = 'Open a Personal Locker?',
+									arrow = true,
+									event = 'SickEvidence:lockerOptions',
+									args = {
+										selection = 'open',
+										inventory = lockerID
+									},
+									metadata = {
+										{label = lockerID}
+									}
+								},
+								{
+									title = 'Delete Locker?',
+									description = 'Delete Your Personal Locker?',
+									arrow = true,
+									event = 'SickEvidence:confirmorcancel',
+									args = {
+										selection = "delete",
+										inventory = lockerID
+									}
+								}
+							},
+						})
+
+						lib.showContext('lockerOption')
+					end
+				end, lockerID)
+			else
+				Notify(3, "Lockers", "Info can\'t be found!")
 			end
-	else
-		exports.SickLibs:ClientNotify(3, "Lockers", "Info can\'t be found!")
+
+		end)
+	elseif Config.Framework == 'QBCore' then
+		Core.Functions.TriggerCallback('SickEvidence:getPlayerName', function(data)
+			if data then
+				local lockerID = ("LEO: "..data.firstname.." "..data.lastname)
+				Core.Functions.TriggerCallback('SickEvidence:getPlayerName', function(locker)
+					if locker then
+						lib.registerContext({
+							id = 'lockerCreate',
+							title = 'Confirm or Cancel',
+							menu = 'openInventory',
+							options = {
+								{
+									title = 'Create New Locker?',
+									description = 'Locker Inventory System'
+								},
+								{
+									title = 'Confirm Creation?',
+									description = 'Create a Personal Locker?',
+									arrow = true,
+									event = 'SickEvidence:confirmLocker',
+									args = {selection = 'confirm', inventory = lockerID}
+								},
+								{
+									title = 'Cancel Creation?',
+									description = 'Cancel The Creation of this Personal Locker?',
+									arrow = true,
+									event = 'SickEvidence:confirmLocker',
+									args = {selection = 'cancel'}
+								}
+							},
+						})
+		
+						lib.showContext('lockerCreate')
+					else
+						lib.registerContext({
+							id = 'lockerOption',
+							title = 'Confirm or Cancel',
+							options = {
+								{
+									title = 'Locker Options',
+									description = 'Locker Delete/Open'
+								},
+								{
+									title = 'Open Locker?',
+									description = 'Open a Personal Locker?',
+									arrow = true,
+									event = 'SickEvidence:lockerOptions',
+									args = {
+										selection = 'open',
+										inventory = lockerID
+									},
+									metadata = {
+										{label = lockerID}
+									}
+								},
+								{
+									title = 'Delete Locker?',
+									description = 'Delete Your Personal Locker?',
+									arrow = true,
+									event = 'SickEvidence:confirmorcancel',
+									args = {
+										selection = "delete",
+										inventory = lockerID
+									}
+								}
+							},
+						})
+		
+						lib.showContext('lockerOption')
+					end
+				end, lockerID)
+			else
+				Notify(3, "Lockers", "Info can\'t be found!")
+			end
+		end)
 	end
 end)
 
@@ -562,50 +736,95 @@ RegisterNetEvent('SickEvidence:ChiefLookup')
 AddEventHandler('SickEvidence:ChiefLookup', function()
 	local input = lib.inputDialog('Police locker', {'First Name', 'Last Name'})
 
-	if not input then 
+	if not input then
 		lib.hideContext(false)
-		return 
+		return
 	end
 	local lockerID = ("LEO: "..input[1].. " "..input[2])
-	local exists = lib.callback.await('SickEvidence:getInventory', 1000, lockerID)
-	if exists then
-		lib.registerContext({
-			id = 'lockerOption',
-			title = 'Confirm or Cancel',
-			options = {
-				{
-					title = 'Locker Options',
-					description = 'Locker Delete/Open'
-				},
-				{
-					title = 'Open Locker?',
-					description = 'Open a Personal Locker?',
-					arrow = true,
-					event = 'SickEvidence:lockerOptions',
-					args = {
-						selection = 'open', 
-						inventory = lockerID
+	if Config.Framework == 'ESX' then
+		Core.TriggerServerCallback('SickEvidence:getInventory', function(exists)
+			if exists then
+				lib.registerContext({
+					id = 'lockerOption',
+					title = 'Confirm or Cancel',
+					options = {
+						{
+							title = 'Locker Options',
+							description = 'Locker Delete/Open'
+						},
+						{
+							title = 'Open Locker?',
+							description = 'Open a Personal Locker?',
+							arrow = true,
+							event = 'SickEvidence:lockerOptions',
+							args = {
+								selection = 'open',
+								inventory = lockerID
+							},
+							metadata = {
+								{label = lockerID}
+							}
+						},
+						{
+							title = 'Delete Locker?',
+							description = 'Delete Your Personal Locker?',
+							arrow = true,
+							event = 'SickEvidence:confirmorcancel',
+							args = {
+								selection = "delete",
+								inventory = lockerID
+							}
+						}
 					},
-					metadata = {
-						{label = lockerID}
-					}
-				},
-				{
-					title = 'Delete Locker?',
-					description = 'Delete Your Personal Locker?',
-					arrow = true,
-					event = 'SickEvidence:confirmorcancel',
-					args = {
-						selection = "delete",
-						inventory = lockerID
-					}
-				}
-			},
-		})
-	
-		lib.showContext('lockerOption')
-	else
-		exports.SickLibs:ClientNotify(3, "Lockers", string.format('No Lockers with name: '..lockerID))	
+				})
+		
+				lib.showContext('lockerOption')
+			else
+				Notify(3, "Lockers", string.format('No Lockers with name: '..lockerID))
+			end
+		end, lockerID)
+	elseif Config.Framework == 'QBCore' then
+		Core.Functions.TriggerCallback('SickEvidence:getInventory', function(exists)
+			if exists then
+				lib.registerContext({
+					id = 'lockerOption',
+					title = 'Confirm or Cancel',
+					options = {
+						{
+							title = 'Locker Options',
+							description = 'Locker Delete/Open'
+						},
+						{
+							title = 'Open Locker?',
+							description = 'Open a Personal Locker?',
+							arrow = true,
+							event = 'SickEvidence:lockerOptions',
+							args = {
+								selection = 'open',
+								inventory = lockerID
+							},
+							metadata = {
+								{label = lockerID}
+							}
+						},
+						{
+							title = 'Delete Locker?',
+							description = 'Delete Your Personal Locker?',
+							arrow = true,
+							event = 'SickEvidence:confirmorcancel',
+							args = {
+								selection = "delete",
+								inventory = lockerID
+							}
+						}
+					},
+				})
+		
+				lib.showContext('lockerOption')
+			else
+				Notify(3, "Lockers", string.format('No Lockers with name: '..lockerID))
+			end
+		end, lockerID)
 	end
 end)
 
@@ -613,45 +832,85 @@ RegisterNetEvent('SickEvidence:ChiefCaseMenu')
 AddEventHandler('SickEvidence:ChiefCaseMenu', function()
 	local input = lib.inputDialog('LSPD Cases', {'Enter Case#'})
 
-	if not input then 
+	if not input then
 		lib.hideContext(false)
-		return 
+		return
 	end
-	local evidenceID = ("Case :#"..input[1])
-	local exists = lib.callback.await('SickEvidence:getInventory', 1000, evidenceID)
-	if exists then
-		lib.registerContext({
-			id = 'evidenceOption',
-			title = 'Evidence Options',
-			options = {
-				{
-					title = 'Evidence Delete/Open'
-				},
-				{
-					title = 'Open Evidence?',
-					description = 'Open Evidence Storage?',
-					arrow = true,
-					event = 'SickEvidence:evidenceOptions',
-					args = {
-						selection = "open",
-						inventory = evidenceID
-					}
-				},
-				{
-					title = 'Delete Inventory?',
-					description = 'Delete this Evidence Storage?',
-					arrow = true,
-					event = 'SickEvidence:evidenceOptions',
-					args = {
-						selection = "delete",
-						inventory = evidenceID
-					}
-				}
-			},
-		})
-		lib.showContext('evidenceOption')
-	else
-		exports.SickLibs:ClientNotify(3, "Lockers", string.format('No Evidence Storages with name: '..evidenceID))
+	local evidenceID = ("Case: "..input[1])
+	if Config.Framework == 'ESX' then
+		Core.TriggerServerCallback('SickEvidence:getInventory', function(exists)
+			if exists then
+				lib.registerContext({
+					id = 'evidenceOption',
+					title = 'Evidence Options',
+					options = {
+						{
+							title = 'Evidence Delete/Open'
+						},
+						{
+							title = 'Open Evidence?',
+							description = 'Open Evidence Storage?',
+							arrow = true,
+							event = 'SickEvidence:evidenceOptions',
+							args = {
+								selection = "open",
+								inventory = evidenceID
+							}
+						},
+						{
+							title = 'Delete Inventory?',
+							description = 'Delete this Evidence Storage?',
+							arrow = true,
+							event = 'SickEvidence:evidenceOptions',
+							args = {
+								selection = "delete",
+								inventory = evidenceID
+							}
+						}
+					},
+				})
+				lib.showContext('evidenceOption')
+			else
+				Notify(3, "Lockers", string.format('No Evidence Storages with name: '..evidenceID))
+			end
+		end, evidenceID)
+	elseif Config.Framework == 'QBCore' then
+		Core.Functions.TriggerCallback('SickEvidence:getInventory', function(exists)
+			if exists then
+				lib.registerContext({
+					id = 'evidenceOption',
+					title = 'Evidence Options',
+					options = {
+						{
+							title = 'Evidence Delete/Open'
+						},
+						{
+							title = 'Open Evidence?',
+							description = 'Open Evidence Storage?',
+							arrow = true,
+							event = 'SickEvidence:evidenceOptions',
+							args = {
+								selection = "open",
+								inventory = evidenceID
+							}
+						},
+						{
+							title = 'Delete Inventory?',
+							description = 'Delete this Evidence Storage?',
+							arrow = true,
+							event = 'SickEvidence:evidenceOptions',
+							args = {
+								selection = "delete",
+								inventory = evidenceID
+							}
+						}
+					},
+				})
+				lib.showContext('evidenceOption')
+			else
+				Notify(3, "Lockers", string.format('No Evidence Storages with name: '..evidenceID))
+			end
+		end, evidenceID)
 	end
 end)
 
@@ -661,47 +920,9 @@ AddEventHandler('SickEvidence:ChiefLockerCheck', function(ID)
 	if exists then
 		lockerOption(ID)
 	else
-		exports.SickLibs:ClientNotify(3, "Lockers", string.format('No Lockers with name: '..ID))	
+		Notify(3, "Lockers", string.format('No Lockers with name: '..ID))
 	end
 end)
-
-local function ChieflockerOption(ID)
-	lib.registerContext({
-		id = 'ChieflockerOption',
-		title = 'Confirm or Cancel',
-		options = {
-			{
-				title = 'Locker Options',
-				description = 'Locker Delete/Open'
-			},
-			{
-				title = 'Open Storage?',
-				description = 'Open an Evidence Locker?',
-				arrow = true,
-				event = 'SickEvidence:lockerOptions',
-				args = {
-					selection = 'open', 
-					inventory = ID
-				},
-				metadata = {
-					{label = ID, value = 'Personal'},
-				}
-			},
-			{
-				title = 'Delete Locker?',
-				description = 'Delete Your Evidence Locker?',
-				arrow = true,
-				event = 'SickEvidence:confirmorcancel',
-				args = {
-					selection = "delete",
-					inventory = lockerID
-				}
-			}
-		},
-	})
-
-	lib.showContext('ChieflockerOption')
-end
 
 RegisterNetEvent('SickEvidence:ChieflockerOptions')
 AddEventHandler('SickEvidence:ChieflockerOptions', function(args)
@@ -747,6 +968,7 @@ end)
 RegisterNetEvent('SickEvidence:OtherlockerCallbackEvent')
 AddEventHandler('SickEvidence:OtherlockerCallbackEvent', function()
 	local data = lib.callback.await('SickEvidence:getPlayerName', 1000)
+
 	if data then
 		local OtherlockerID = (PlayerData.job.name.. ": " ..data.firstname.." "..data.lastname)
 		local Otherlocker = lib.callback.await('SickEvidence:getOtherInventories', 1000, OtherlockerID)
@@ -765,7 +987,7 @@ AddEventHandler('SickEvidence:OtherlockerCallbackEvent', function()
 							arrow = true,
 							event = 'SickEvidence:OtherlockerOptions',
 							args = {
-								selection = 'open', 
+								selection = 'open',
 								inventory = OtherlockerID
 							}
 						},
@@ -781,7 +1003,7 @@ AddEventHandler('SickEvidence:OtherlockerCallbackEvent', function()
 						}
 					},
 				})
-			
+
 				lib.showContext('Other_lockerOption')
 			else
 				lib.registerContext({
@@ -808,11 +1030,11 @@ AddEventHandler('SickEvidence:OtherlockerCallbackEvent', function()
 						}
 					},
 				})
-			
+
 				lib.showContext('Other_lockerCreate')
 			end
 	else
-		exports.SickLibs:ClientNotify(3, "Lockers", "Info can\'t be found!")
+		Notify(3, "Lockers", "Info can\'t be found!")
 	end
 end)
 

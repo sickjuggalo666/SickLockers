@@ -1,13 +1,13 @@
 Config = {}
-Config.Framework = 'QBCore' -- 'ESX' or 'QBCore'
+Config.Framework = 'ESX' -- 'ESX' or 'QBCore'
 Config.Target = 'ox_target'
-Config.SickDirtyCopsHeist = true
+Config.SickDirtyCopsHeist = false -- COMING SOON
 Config.inventory = 'ox'
 Config.location = {
     {
         UsePed = true, -- Do you want to use a ped?
-        coords = vector3(465.7496, -994.5123, 26.6235), 
-        h = 88.6331, 
+        coords = vector3(465.6510, -998.3225, 24.9148),
+        h = 95.5823,
         size = vec3(3, 2, 3), -- size of the box zone
         rotation = 90, -- Rotation of box zone
         AllowedRank = 10, -- allowed ranks for Chief Options
@@ -18,20 +18,20 @@ Config.location = {
     },
     {
         UsePed = true,
-        coords = vector3(335.5984, -570.5597, 43.2493), 
-        h = 60.4760, 
+        coords = vector3(335.5984, -570.5597, 43.2493),
+        h = 60.4760,
         job = 'ambulance',
-        AllowedRank = 3, 
+        AllowedRank = 3,
         cop = false,
         TargetLabel = 'Open Ambulance Lockers',
         ped = 'S_M_M_Doctor_01'
     },
     {
         UsePed = true,
-        coords = vector3(-214.3525, -1365.2156, 30.2748), 
-        h = 159.3064, 
+        coords = vector3(-214.3525, -1365.2156, 30.2748),
+        h = 159.3064,
         job = 'mechanic',
-        AllowedRank = 0, 
+        AllowedRank = 0,
         cop = false,
         TargetLabel = 'Open Mechanic Lockers',
         ped = 'S_M_Y_XMech_02_MP'
