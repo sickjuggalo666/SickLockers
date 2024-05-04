@@ -33,7 +33,9 @@ end
 
 local function Notify(type,title, message)
     if title == nil then title = "Lockers" end
-    if Config.NotificationType.Client == 'libs' then
+	if Config.NotificationType.client == 'esx' then
+		ESX.ShowNotification(message)
+	elseif Config.NotificationType.Client == 'libs' then
             if type == 1 then
                 lib.notify({
                     title = title,
@@ -53,9 +55,53 @@ local function Notify(type,title, message)
                     type = 'error'
                 })
             end
-    elseif Config.NotificationType.Client == 'custom' then
+	elseif Config.NotificationType.client == 'okokNotify' then
+		if type == 1 then
+			lib.notify({
+				title = title,
+				description = message,
+				type = 'success',
+				duration = 2500
+			})
+		elseif type == 2 then
+			lib.notify({
+				title = title,
+				description = message,
+				type = 'inform',
+				duration = 2500
+			})
+		elseif type == 3 then
+			lib.notify({
+				title = title,
+				description = message,
+				type = 'error',
+				duration = 2500
+			})
+		end
 
-    end
+	elseif Config.NotificationType.client == 'mythic' then
+		if type == 1 then
+			exports['mythic_notify']:SendAlert('success', message, { ['background-color'] = '#ffffff', ['color'] = '#000000' })
+		elseif type == 2 then
+			exports['mythic_notify']:SendAlert('inform', message, { ['background-color'] = '#ffffff', ['color'] = '#000000' })
+		elseif type == 3 then
+			exports['mythic_notify']:SendAlert('error', message, { ['background-color'] = '#ffffff', ['color'] = '#000000' })
+		end
+	elseif Config.NotificationType.client == 'qbcore' then
+		if type == 1 then
+			QBCore.Functions.Notify(message, 'success', 5000)
+		elseif type == 2 then
+			QBCore.Functions.Notify(message, 'info', 5000)
+		elseif type == 3 then
+			QBCore.Functions.Notify(message, 'error', 5000)
+		end
+	elseif Config.NotificationType.client == 'chat' then
+		TriggerEvent('chatMessage', message)
+
+	elseif Config.NotificationType.client == 'other' then
+		--add your own notification.
+
+	end
 end
 
 
