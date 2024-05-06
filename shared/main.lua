@@ -1,13 +1,13 @@
 Config = {}
-Config.Framework = 'ESX' -- 'ESX' or 'QBCore'
+Config.Framework = 'QBCore' -- 'ESX' or 'QBCore'
 Config.Target = 'ox_target'
-Config.SickDirtyCopsHeist = false -- COMING SOON
-Config.inventory = 'ox'
+Config.SickDirtyCopsHeist = false
+Config.inventory = 'qb' -- 'ox' or 'qb'
 Config.location = {
     {
         UsePed = true, -- Do you want to use a ped?
-        coords = vector3(465.6510, -998.3225, 24.9148),
-        h = 95.5823,
+        coords = vector3(452.2714, -981.0186, 29.6896),
+        h = 99.5089,
         size = vec3(3, 2, 3), -- size of the box zone
         rotation = 90, -- Rotation of box zone
         AllowedRank = 10, -- allowed ranks for Chief Options

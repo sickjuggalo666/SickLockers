@@ -143,13 +143,15 @@ end)
 RegisterNetEvent('SickEvidence:deleteLocker')
 AddEventHandler('SickEvidence:deleteLocker', function(lockerID)
     local src = source
-    MySQL.update('DELETE FROM ox_inventory WHERE name = ?',
+    MySQL.query('DELETE FROM ox_inventory WHERE name = ?',
       {
-        lockerID
+        lockerID.inventory
       },function(result)
         if result then
+          print('true')
           --Notify(1, src, "Locker was deleted Successfully!")
         else
+          print('false')
           --Notify(3, src, "Locker wasn\'t Deleted please try again!")
         end
     end)
@@ -166,7 +168,6 @@ if Config.Framework == 'ESX' then
                 firstname = results[1].firstname,
                 lastname  = results[1].lastname,
               }
-              print(json.encode(data, {indent=true}))
               cb(data)
           end
       end)
@@ -174,7 +175,7 @@ if Config.Framework == 'ESX' then
     end)
     Core.RegisterServerCallback('SickEvidence:getLocker', function(src, cb, lockerID)
         local inv = exports.ox_inventory:GetInventory(lockerID, false)
-        if not inv then
+        if inv then
           cb(true)
         else
           cb(false)
@@ -189,9 +190,7 @@ if Config.Framework == 'ESX' then
         end
     end)
     Core.RegisterServerCallback('SickEvidence:getInventory', function(source, cb, evidenceID)
-      print(evidenceID)
         local inv = exports.ox_inventory:GetInventory(evidenceID, false)
-        print(json.encode(inv, {indent=true}))
         if inv then
           cb(true)
         else
@@ -199,7 +198,7 @@ if Config.Framework == 'ESX' then
         end
     end)
 elseif Config.Framework == 'QBCore' then
-    Core.Functions.CreateCallback('SickEvidence:getPlayerName',function(source,cb)
+    Core.Functions.CreateCallback('SickEvidence:getPlayerName',function(source, cb)
         local xPlayer = Core.Functions.GetPlayer(source)
         local data = {
           firstname = xPlayer.PlayerData.charinfo.firstname,
@@ -217,16 +216,14 @@ elseif Config.Framework == 'QBCore' then
     end)
     Core.Functions.CreateCallback('SickEvidence:getOtherInventories',function(source,cb, Otherlocker)
         local inv = exports.ox_inventory:GetInventory(Otherlocker, false)
-        if not inv then
+        if inv then
           cb(true)
         else
           cb(false)
         end
     end)
     Core.Functions.CreateCallback('SickEvidence:getInventory', function(source, cb, evidenceID)
-      print(evidenceID)
         local inv = exports.ox_inventory:GetInventory(evidenceID, false)
-        print(json.encode(inv, {indent=true}))
         if inv then
           cb(true)
         else
@@ -235,17 +232,10 @@ elseif Config.Framework == 'QBCore' then
     end)
 end
 
-AddEventHandler('txAdmin:events:scheduledRestart', function(eventData)
-  if eventData.secondsRemaining == 60 then
-      CreateThread(function()
-          Wait(45000)
-          ExecuteCommand('saveinv')
-      end)
-  end
-end)
-
-AddEventHandler('onResourceStop', function(resourceName)
-    if (GetCurrentResourceName() == resourceName) then
-        ExecuteCommand('saveinv')
-    end
+RegisterNetEvent('SickEvidence:loadStashes', function(id)
+    MySQL.query('SELECT * FROM `ox_inventory` WHERE name =?', {id}, function(result)
+        if result then
+          ox_inventory:RegisterStash(id, id, 50, 100000)
+        end
+    end)
 end)
