@@ -1,4 +1,4 @@
-Docs: ( https://docs.sickscripts.shop/)
+Docs: ( https://docs.sickscripts.com/)
 
 ##DISCORD LINK##
 
