@@ -234,7 +234,7 @@ end
 
 RegisterNetEvent('SickEvidence:loadStashes', function(id)
     MySQL.query('SELECT * FROM `ox_inventory` WHERE name =?', {id}, function(result)
-        if result then
+        if not result then
           ox_inventory:RegisterStash(id, id, 50, 100000)
         end
     end)
