@@ -134,12 +134,12 @@ Citizen.CreateThread(function()
                 distance = 2.5
             })
 		elseif Config.Target == 'qb-target' then
-			exports[Config.Target]:AddBoxZone("evidence_Lockers", vector3(v.coords.x,v.coords.y,v.coords.z), 3, 2, {
+			exports[Config.Target]:AddBoxZone("evidence_Lockers", vector3(v.coords.x,v.coords.y,v.coords.z+1), 0.75,0.75, {
                 name = 'evidence_Lockers',
                 heading = v.h,
-                debugPoly = false,
-				minZ = 1.58,
-				maxZ = 4.56
+                debugPoly = true,
+				minZ = 10.77834,
+				maxZ = 32.87834,
 			}, {
 				options = {
 					{
