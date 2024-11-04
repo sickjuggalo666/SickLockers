@@ -201,6 +201,7 @@ elseif Config.Framework == 'QBCore' then
     Core.Functions.CreateCallback('SickEvidence:getPlayerName',function(source, cb)
         local xPlayer = Core.Functions.GetPlayer(source)
         local data = {
+          job = xPlayer.PlayerData.job.label,
           firstname = xPlayer.PlayerData.charinfo.firstname,
           lastname  = xPlayer.PlayerData.charinfo.lastname,
         }
@@ -234,7 +235,7 @@ end
 
 RegisterNetEvent('SickEvidence:loadStashes', function(id)
     MySQL.query('SELECT * FROM `ox_inventory` WHERE name =?', {id}, function(result)
-        if not result then
+        if result then
           ox_inventory:RegisterStash(id, id, 50, 100000)
         end
     end)
