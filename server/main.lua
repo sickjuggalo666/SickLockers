@@ -135,7 +135,34 @@ AddEventHandler('SickEvidence:createOtherLocker', function(OtherlockerID)
         local maxWeight = 5000
 
         ox_inventory:RegisterStash(id, label, slots, maxWeight, nil, false, nil)
-        local message = ('%s %s Created Job Locker %s'):format(Player.PlayerData.charinfo.firstname, Player.PlayerData.charinfo.lastname, label)
+        local message = ('%s %s Created Job Locker %s'):format(xPlayer.PlayerData.charinfo.firstname, xPlayer.PlayerData.charinfo.lastname, label)
+        sendCreateDiscord(source, name, message, label)
+    end
+end)
+
+RegisterNetEvent('SickEvidence:createGangLocker')
+AddEventHandler('SickEvidence:createGangLocker', function(GanglockerID)
+    if Config.Framework == 'ESX' then
+      local xPlayer = Core.GetPlayerFromId(source)
+      local name = xPlayer.getName()
+      local id = GanglockerID
+      local label = GanglockerID
+      local slots = 25
+      local maxWeight = 5000
+
+      ox_inventory:RegisterStash(id, label, slots, maxWeight, nil, false, nil)
+      local message = ('%s Created Job Locker %s'):format(xPlayer.getName(), label)
+      sendCreateDiscord(source, name, message, label)
+    elseif Config.Framework == 'QBCore' then
+        local xPlayer = Core.Functions.GetPlayer(source)
+        local name = xPlayer.PlayerData.charinfo.firstname..' '..xPlayer.PlayerData.charinfo.lastname
+        local id = GanglockerID
+        local label = GanglockerID
+        local slots = 25
+        local maxWeight = 5000
+
+        ox_inventory:RegisterStash(id, label, slots, maxWeight, nil, false, nil)
+        local message = ('%s %s Created Job Locker %s'):format(xPlayer.PlayerData.charinfo.firstname, xPlayer.PlayerData.charinfo.lastname, label)
         sendCreateDiscord(source, name, message, label)
     end
 end)

@@ -67,32 +67,216 @@ local function refreshjob()
 	end
 end
 
-Citizen.CreateThread(function()
-	for k, v in pairs(Config.location) do
-		if v.UsePed == true then
-			local hash = GetHashKey(v.ped)
-			if not HasModelLoaded(hash) then
-				RequestModel(hash)
-				Wait(10)
-			end
-			while not HasModelLoaded(hash) do
-				Wait(10)
-			end
+for k, v in pairs(Config.location) do
+	if v.UsePed == true then
+		local hash = GetHashKey(v.ped)
+		if not HasModelLoaded(hash) then
+			RequestModel(hash)
+			Wait(10)
+		end
+		while not HasModelLoaded(hash) do
+			Wait(10)
+		end
 
-			pedspawned = true
-			evidenceNpc = CreatePed(5, hash, v.coords, v.h, false, false)
-			SetBlockingOfNonTemporaryEvents(evidenceNpc, true)
-			SetPedDiesWhenInjured(evidenceNpc, false)
-			SetPedCanPlayAmbientAnims(evidenceNpc, true)
-			SetPedCanRagdollFromPlayerImpact(evidenceNpc, false)
-			SetPedCanBeTargetted(evidenceNpc, false)
-			SetEntityInvincible(evidenceNpc, true)
-			FreezeEntityPosition(evidenceNpc, true)
+		pedspawned = true
+		evidenceNpc = CreatePed(5, hash, v.coords, v.h, false, false)
+		SetBlockingOfNonTemporaryEvents(evidenceNpc, true)
+		SetPedDiesWhenInjured(evidenceNpc, false)
+		SetPedCanPlayAmbientAnims(evidenceNpc, true)
+		SetPedCanRagdollFromPlayerImpact(evidenceNpc, false)
+		SetPedCanBeTargetted(evidenceNpc, false)
+		SetEntityInvincible(evidenceNpc, true)
+		FreezeEntityPosition(evidenceNpc, true)
+	end
+end
+
+for k,v in pairs(Config.GangLocations) do
+	if v.UsePed == true then
+		local hash = GetHashKey(v.ped)
+		if not HasModelLoaded(hash) then
+			RequestModel(hash)
+			Wait(10)
+		end
+		while not HasModelLoaded(hash) do
+			Wait(10)
+		end
+
+		pedspawned = true
+		evidenceNpc = CreatePed(5, hash, v.coords, v.h, false, false)
+		SetBlockingOfNonTemporaryEvents(evidenceNpc, true)
+		SetPedDiesWhenInjured(evidenceNpc, false)
+		SetPedCanPlayAmbientAnims(evidenceNpc, true)
+		SetPedCanRagdollFromPlayerImpact(evidenceNpc, false)
+		SetPedCanBeTargetted(evidenceNpc, false)
+		SetEntityInvincible(evidenceNpc, true)
+		FreezeEntityPosition(evidenceNpc, true)
+	end
+end
+
+
+local function isGang(gang)
+	local Player = Core.Functions.GetPlayerData()
+	if Player.gang.name == gang then
+		return true
+	else
+		return false
+	end
+end
+
+local function OpenGangLocker(gang)
+	if Config.inventory == 'qb' then
+		TriggerServerEvent('SickLockers:OpenInvQB', string.upper(gang))
+	elseif Config.inventory == 'ox' then
+		TriggerServerEvent("SickEvidence:createGangLocker", string.upper(gang))
+		Wait(1000)
+	    ox_inventory:openInventory('Stash', string.upper(gang))
+	end
+end
+
+local function OpenPersonalGangLocker()
+	local Player = Core.Functions.GetPlayerData()
+	local name = string.upper(Player.gang.name)..': '..Player.charinfo.firstname
+	if Config.inventory == 'qb' then
+		TriggerServerEvent('SickLockers:OpenInvQB', name)
+	elseif Config.inventory == 'ox' then
+		TriggerServerEvent("SickEvidence:createGangLocker", name)
+		Wait(1000)
+	    ox_inventory:openInventory('Stash', name)
+	end
+end
+
+RegisterNetEvent('SickLockers:OpenGangLocker')
+AddEventHandler('SickLockers:OpenGangLocker', function(k)
+	local Player = Core.Functions.GetPlayerData()
+	if Player.gang.name == k.gang then
+		if Player.gang['grade'].level >= k.AllowedRank then
+			lib.registerContext({
+				id = 'GangInventory',
+				title = 'Gang Lockers!',
+				options = {
+					{
+						title = 'Open Gang Locker',
+						description = 'Open Gang Locker',
+						arrow = true,
+						event = 'SickEvidence:OpenGangLocker',
+						onSelect = function()
+							OpenGangLocker(k.gang)
+						end
+					},
+					{
+						title = 'Open Personal Gang Locker',
+						description = 'Open Personal Gang Locker',
+						arrow = true,
+						event = 'SickEvidence:OpenPersonalGangLocker',
+						onSelect = function()
+							OpenPersonalGangLocker()
+						end
+					}
+				},
+			})
+			lib.showContext('GangInventory')
+		elseif Config.PoliceJobs[Player.job.name] then
+			lib.registerContext({
+				id = 'PoliceRaidInventory',
+				title = 'Gang Lockers!',
+				options = {
+					{
+						title = 'Open Gang Locker',
+						description = 'Open Gang Locker',
+						arrow = true,
+						event = 'SickEvidence:OpenGangLocker',
+						onSelect = function()
+							OpenGangLocker(k.gang)
+						end
+					}
+				},
+			})
+			lib.showContext('PoliceRaidInventory')
 		end
 	end
 end)
 
-Citizen.CreateThread(function()
+
+if Config.Framework == 'QBCore' then
+	for k,v in pairs(Config.GangLocations) do
+		if Config.Target == 'ox_target' then
+			exports[Config.Target]:addBoxZone({
+				coords = vector3(v.coords.x,v.coords.y,v.coords.z),
+				size = v.size,
+				rotation = v.rotation,
+				debug = false,
+				options = {
+					{
+						name = 'gang_locker',
+						icon = 'fa-solid fa-cube',
+						label = v.TargetLabel,
+						canInteract = function(entity, distance, coords, name)
+							--if isGang(v.gang) then
+								return isGang(v.gang)
+							--end
+						end,
+						onSelect = function()
+							TriggerEvent('SickLockers:OpenGangLocker', v)
+						end
+					},
+					--[[{
+						name = 'evidence_heist',
+						icon = 'fa-solid fa-cube',
+						label = 'Hack Evidence',
+						canInteract = function(entity, distance, coords, name)
+							local isHeist = exports.SickLibs:IsInHeist()
+							if isHeist and Config.SickDirtyCopsHeist and v.cop then
+								return true
+							end
+						end,
+						onSelect = function()
+							TriggerEvent('SickLockers:OpenGangLocker', true)
+						end
+					}]]
+				}
+			})
+		elseif Config.Target == 'qtarget' then
+			exports[Config.Target]:AddBoxZone('evidence_Lockers', vector3(v.coords.x,v.coords.y,v.coords.z), 3, 2, {
+                name='evidence_Lockers',
+                heading = v.h,
+                debugPoly=false,
+				minZ = 1.58,
+				maxZ = 4.56
+            }, {
+                options = {
+                    {
+                    	event = 'SickLockers:OpenGangLocker',
+                    	icon = 'fas fa-door-open',
+                    	label = v.TargetLabel,
+                    },
+                },
+				job = {v.job},
+                distance = 2.5
+            })
+		elseif Config.Target == 'qb-target' then
+			exports[Config.Target]:AddBoxZone("evidence_Lockers", v.coords, 3, 2, {
+                name = 'evidence_Lockers',
+                heading = v.h,
+                debugPoly = false,
+				minZ = 1.58,
+				maxZ = 4.56
+			}, {
+				options = {
+					{
+						type = "client",
+						event = 'SickLockers:OpenGangLocker',
+						icon = 'fas fa-door-open',
+						label = v.TargetLabel,
+						job = v.job,
+					},
+				},
+				distance = 2.5
+			})
+
+		end
+	end
+end
+
 	for k,v in pairs(Config.location) do
 		if Config.Target == 'ox_target' then
 			exports[Config.Target]:addBoxZone({
@@ -113,7 +297,7 @@ Citizen.CreateThread(function()
 							TriggerEvent('SickEvidence:openInventory', false)
 						end
 					},
-					--[[{ -- COMING SOON
+					--[[{
 						name = 'evidence_heist',
 						icon = 'fa-solid fa-cube',
 						label = 'Hack Evidence',
@@ -126,7 +310,7 @@ Citizen.CreateThread(function()
 						onSelect = function()
 							TriggerEvent('SickEvidence:openInventory', true)
 						end
-					}]] -- COMING SOON
+					}]]
 				}
 			})
 		elseif Config.Target == 'qtarget' then
@@ -169,7 +353,7 @@ Citizen.CreateThread(function()
 
 		end
 	end
-end)
+
 
 
 lib.registerContext({
@@ -216,6 +400,7 @@ lib.registerContext({
 	},
 })
 
+
 --[[lib.registerContext({
 	id = 'openHeistInv',
 	title = 'Evidence Lockers!',
@@ -240,8 +425,8 @@ AddEventHandler('SickEvidence:openInventory',function(isHeist)
 				lib.showContext('openInventory')
 			elseif v.cop == false and v.job == PlayerData.job.name then
 				lib.showContext('other_lockers')
-			elseif isHeist then
-				lib.showContext('openHeistInv')
+			--[[elseif isHeist then
+				lib.showContext('openHeistInv')]]
 			end
 		end
 	elseif Config.Framework == 'QBCore' then
@@ -252,8 +437,8 @@ AddEventHandler('SickEvidence:openInventory',function(isHeist)
 				lib.showContext('openInventory')
 			elseif v.cop == false and v.job == PlayerData.job.name then
 				lib.showContext('other_lockers')
-			elseif isHeist then
-				lib.showContext('openHeistInv')
+			--[[elseif isHeist then
+				lib.showContext('openHeistInv')]]
 			end
 		end
 	end
@@ -470,6 +655,7 @@ AddEventHandler('SickEvidence:evidenceOptions', function(args)
 		local evidenceID = args.inventory
 		TriggerServerEvent("SickEvidence:deleteEvidence", evidenceID)
 		Notify(1, "Lockers", "Deleted Evidence!")
+		--exports.SickLibs:ClientNotify(1, "Lockers", "Deleted Evidence!")
 	elseif args.selection == "open" then
 		local evidenceID = args.inventory
 		TriggerServerEvent('SickEvidence:loadStashes', evidenceID)
@@ -537,6 +723,7 @@ AddEventHandler('SickEvidence:lockerOptions', function(args)
 	if args.selection == "delete" then
 		local lockerID = args.inventory
 		TriggerServerEvent("SickEvidence:deleteLocker", lockerID)
+		--exports.SickLibs:ClientNotify(1, "Lockers", "Deleted Locker!")
 	elseif args.selection == "open" then
 		local lockerID = args.inventory
 		TriggerServerEvent('SickEvidence:loadStashes', lockerID)

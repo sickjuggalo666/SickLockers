@@ -1,13 +1,18 @@
 Config = {}
 Config.Framework = 'QBCore' -- 'ESX' or 'QBCore'
-Config.Target = 'qb-target' -- 'ox_target', 'qb-target'
-Config.SickDirtyCopsHeist = false -- COMING SOON
-Config.inventory = 'ox' -- 'ox' or 'qb'
+Config.Target = 'ox_target'
+Config.SickDirtyCopsHeist = false
+Config.inventory = 'ox'
+
+Config.PoliceJobs = {
+    ['police'] = true
+}
+
 Config.location = {
     {
         UsePed = true, -- Do you want to use a ped?
-        coords = vector3(452.2714, -981.0186, 29.6896),
-        h = 99.5089,
+        coords = vector3(438.6085, -994.3947, 29.6896),
+        h = 264.2495,
         size = vec3(3, 2, 3), -- size of the box zone
         rotation = 90, -- Rotation of box zone
         AllowedRank = 10, -- allowed ranks for Chief Options
@@ -26,16 +31,28 @@ Config.location = {
         TargetLabel = 'Open Ambulance Lockers',
         ped = 'S_M_M_Doctor_01'
     },
-{
-    UsePed = true,
-    coords = vector3(-214.3525, -1365.2156, 30.2748),
-    h = 159.3064,
-    job = 'mechanic',
-    AllowedRank = 0,
-    cop = false,
-    TargetLabel = 'Open Mechanic Lockers',
-    ped = 'S_M_Y_XMech_02_MP'
+    {
+        UsePed = true,
+        coords = vector3(-214.3525, -1365.2156, 30.2748),
+        h = 159.3064,
+        job = 'mechanic',
+        AllowedRank = 0,
+        cop = false,
+        TargetLabel = 'Open Mechanic Lockers',
+        ped = 'S_M_Y_XMech_02_MP'
+    }
 }
+
+Config.GangLocations = {
+    {
+        UsePed = true,
+        coords = vector3(425.7189, -985.5151, 29.7109),
+        h = 1.2687,
+        gang = 'ballas',
+        AllowedRank = 0,
+        TargetLabel = 'Open Gang Locker',
+        ped = 'IG_BallasOG'
+    }
 }
 
 Config.NotificationType = {
