@@ -68,48 +68,52 @@ local function refreshjob()
 end
 
 for k, v in pairs(Config.location) do
-	if v.UsePed == true then
-		local hash = GetHashKey(v.ped)
-		if not HasModelLoaded(hash) then
-			RequestModel(hash)
-			Wait(10)
-		end
-		while not HasModelLoaded(hash) do
-			Wait(10)
-		end
+	if not Config.Target == 'qb-target' then
+		if v.UsePed == true then
+			local hash = GetHashKey(v.ped)
+			if not HasModelLoaded(hash) then
+				RequestModel(hash)
+				Wait(10)
+			end
+			while not HasModelLoaded(hash) do
+				Wait(10)
+			end
 
-		pedspawned = true
-		evidenceNpc = CreatePed(5, hash, v.coords, v.h, false, false)
-		SetBlockingOfNonTemporaryEvents(evidenceNpc, true)
-		SetPedDiesWhenInjured(evidenceNpc, false)
-		SetPedCanPlayAmbientAnims(evidenceNpc, true)
-		SetPedCanRagdollFromPlayerImpact(evidenceNpc, false)
-		SetPedCanBeTargetted(evidenceNpc, false)
-		SetEntityInvincible(evidenceNpc, true)
-		FreezeEntityPosition(evidenceNpc, true)
+			pedspawned = true
+			evidenceNpc = CreatePed(5, hash, v.coords, v.h, false, false)
+			SetBlockingOfNonTemporaryEvents(evidenceNpc, true)
+			SetPedDiesWhenInjured(evidenceNpc, false)
+			SetPedCanPlayAmbientAnims(evidenceNpc, true)
+			SetPedCanRagdollFromPlayerImpact(evidenceNpc, false)
+			SetPedCanBeTargetted(evidenceNpc, false)
+			SetEntityInvincible(evidenceNpc, true)
+			FreezeEntityPosition(evidenceNpc, true)
+		end
 	end
 end
 
 for k,v in pairs(Config.GangLocations) do
-	if v.UsePed == true then
-		local hash = GetHashKey(v.ped)
-		if not HasModelLoaded(hash) then
-			RequestModel(hash)
-			Wait(10)
-		end
-		while not HasModelLoaded(hash) do
-			Wait(10)
-		end
+	if not Config.Target == 'qb-target' then
+		if v.UsePed == true then
+			local hash = GetHashKey(v.ped)
+			if not HasModelLoaded(hash) then
+				RequestModel(hash)
+				Wait(10)
+			end
+			while not HasModelLoaded(hash) do
+				Wait(10)
+			end
 
-		pedspawned = true
-		evidenceNpc = CreatePed(5, hash, v.coords, v.h, false, false)
-		SetBlockingOfNonTemporaryEvents(evidenceNpc, true)
-		SetPedDiesWhenInjured(evidenceNpc, false)
-		SetPedCanPlayAmbientAnims(evidenceNpc, true)
-		SetPedCanRagdollFromPlayerImpact(evidenceNpc, false)
-		SetPedCanBeTargetted(evidenceNpc, false)
-		SetEntityInvincible(evidenceNpc, true)
-		FreezeEntityPosition(evidenceNpc, true)
+			pedspawned = true
+			evidenceNpc = CreatePed(5, hash, v.coords, v.h, false, false)
+			SetBlockingOfNonTemporaryEvents(evidenceNpc, true)
+			SetPedDiesWhenInjured(evidenceNpc, false)
+			SetPedCanPlayAmbientAnims(evidenceNpc, true)
+			SetPedCanRagdollFromPlayerImpact(evidenceNpc, false)
+			SetPedCanBeTargetted(evidenceNpc, false)
+			SetEntityInvincible(evidenceNpc, true)
+			FreezeEntityPosition(evidenceNpc, true)
+		end
 	end
 end
 
@@ -254,107 +258,69 @@ if Config.Framework == 'QBCore' then
                 distance = 2.5
             })
 		elseif Config.Target == 'qb-target' then
-			exports[Config.Target]:AddBoxZone("evidence_Lockers", v.coords, 3, 2, {
-                name = 'evidence_Lockers',
-                heading = v.h,
-                debugPoly = false,
-				minZ = 1.58,
-				maxZ = 4.56
-			}, {
-				options = {
-					{
-						type = "client",
-						event = 'SickLockers:OpenGangLocker',
-						icon = 'fas fa-door-open',
-						label = v.TargetLabel,
-						job = v.job,
-					},
-				},
-				distance = 2.5
-			})
-
+			break
 		end
 	end
 end
 
-	for k,v in pairs(Config.location) do
-		if Config.Target == 'ox_target' then
-			exports[Config.Target]:addBoxZone({
-				coords = vector3(v.coords.x,v.coords.y,v.coords.z+1.5),
-				size = v.size,
-				rotation = v.rotation,
-				debug = false,
-				options = {
-					{
-						name = 'evidence_Lockers',
-						icon = 'fa-solid fa-cube',
-						groups = v.job,
-						label = v.TargetLabel,
-						canInteract = function(entity, distance, coords, name)
-							return true
-						end,
-						onSelect = function()
-							TriggerEvent('SickEvidence:openInventory', false)
-						end
-					},
-					--[[{
-						name = 'evidence_heist',
-						icon = 'fa-solid fa-cube',
-						label = 'Hack Evidence',
-						canInteract = function(entity, distance, coords, name)
-							local isHeist = exports.SickLibs:IsInHeist()
-							if isHeist and Config.SickDirtyCopsHeist and v.cop then
-								return true
-							end
-						end,
-						onSelect = function()
-							TriggerEvent('SickEvidence:openInventory', true)
-						end
-					}]]
-				}
-			})
-		elseif Config.Target == 'qtarget' then
-			exports[Config.Target]:AddBoxZone('evidence_Lockers', vector3(v.coords.x,v.coords.y,v.coords.z), 3, 2, {
-                name='evidence_Lockers',
-                heading = v.h,
-                debugPoly=false,
-				minZ = 1.58,
-				maxZ = 4.56
-            }, {
-                options = {
-                    {
-                    event = 'SickEvidence:openInventory',
-                    icon = 'fas fa-door-open',
-                    label = v.TargetLabel,
-                    },
-                },
-				job = {v.job},
-                distance = 2.5
-            })
-		elseif Config.Target == 'qb-target' then
-			exports[Config.Target]:AddBoxZone("evidence_Lockers", v.coords, 3, 2, {
-                name = 'evidence_Lockers',
-                heading = v.h,
-                debugPoly = false,
-				minZ = 1.58,
-				maxZ = 4.56
-			}, {
-				options = {
-					{
-						type = "client",
-						event = 'SickEvidence:openInventory',
-						icon = 'fas fa-door-open',
-						label = v.TargetLabel,
-						job = v.job,
-					},
+for k,v in pairs(Config.location) do
+	if Config.Target == 'ox_target' then
+		exports[Config.Target]:addBoxZone({
+			coords = vector3(v.coords.x,v.coords.y,v.coords.z+1.5),
+			size = v.size,
+			rotation = v.rotation,
+			debug = false,
+			options = {
+				{
+					name = 'evidence_Lockers',
+					icon = 'fa-solid fa-cube',
+					groups = v.job,
+					label = v.TargetLabel,
+					canInteract = function(entity, distance, coords, name)
+						return true
+					end,
+					onSelect = function()
+						TriggerEvent('SickEvidence:openInventory', false)
+					end
 				},
-				distance = 2.5
-			})
-
-		end
+				--[[{
+					name = 'evidence_heist',
+					icon = 'fa-solid fa-cube',
+					label = 'Hack Evidence',
+					canInteract = function(entity, distance, coords, name)
+						local isHeist = exports.SickLibs:IsInHeist()
+						if isHeist and Config.SickDirtyCopsHeist and v.cop then
+							return true
+						end
+					end,
+					onSelect = function()
+						TriggerEvent('SickEvidence:openInventory', true)
+					end
+				}]]
+			}
+		})
+	elseif Config.Target == 'qtarget' then
+		exports[Config.Target]:AddBoxZone('evidence_Lockers', vector3(v.coords.x,v.coords.y,v.coords.z), 3, 2, {
+			name='evidence_Lockers',
+			heading = v.h,
+			debugPoly=false,
+			minZ = 1.58,
+			maxZ = 4.56
+		}, {
+			options = {
+				{
+				event = 'SickEvidence:openInventory',
+				icon = 'fas fa-door-open',
+				label = v.TargetLabel,
+				},
+			},
+			job = {v.job},
+			distance = 2.5
+		})
+	elseif Config.Target == 'qb-target' then
+		break
 	end
-
-
+end
 
 lib.registerContext({
 	id = 'chiefmenu',
