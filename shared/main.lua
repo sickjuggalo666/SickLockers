@@ -2,7 +2,7 @@ Config = {}
 Config.Framework = 'QBCore' -- 'ESX' or 'QBCore'
 Config.Target = 'ox_target' -- 'ox_target', 'qtarget', 'qb-target'
 Config.SickDirtyCopsHeist = false
-Config.inventory = 'ox'
+Config.inventory = 'ox' -- 'ox' or 'qs' or 'qb'
 
 Config.PoliceJobs = {
     ['police'] = true

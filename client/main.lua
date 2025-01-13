@@ -542,7 +542,7 @@ AddEventHandler('SickEvidence:triggerEvidenceMenu', function()
 			end
 		end,evidenceID)
 	elseif Config.Framework == 'QBCore' then
-		if Config.inventory == 'qb' then
+		if Config.inventory == 'qb' or Config.inventory == 'qs' then
 			TriggerServerEvent('SickLockers:OpenInvQB', evidenceID)
 		elseif Config.inventory == 'ox' then
 			Core.Functions.TriggerCallback('SickEvidence:getInventory', function(exists)

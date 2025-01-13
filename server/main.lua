@@ -51,25 +51,41 @@ end
 RegisterNetEvent('SickEvidence:createInventory')
 AddEventHandler('SickEvidence:createInventory', function(evidenceID)
     if Config.Framework == 'ESX' then
-      local xPlayer = Core.GetPlayerFromId(source)
-      local name = xPlayer.getName()
-      local id = evidenceID
-      local label = evidenceID
-      local slots = 25
-      local maxWeight = 5000
+      if Config.Inventory == 'ox' then
+        local xPlayer = Core.GetPlayerFromId(source)
+        local name = xPlayer.getName()
+        local id = evidenceID
+        local label = evidenceID
+        local slots = 25
+        local maxWeight = 5000
 
-      ox_inventory:RegisterStash(id, label, slots, maxWeight, nil, false, nil)
-      sendCreateDiscord(source, name, "Created Evidence", evidenceID)
+        ox_inventory:RegisterStash(id, label, slots, maxWeight, nil, false, nil)
+        sendCreateDiscord(source, name, "Created Evidence", evidenceID)
+      elseif Config.Inventory == 'qs' then
+        local stash = evidenceID
+        local slots = 25
+        local weight = 5000
+        exports['qs-inventory']:RegisterStash(source, stash, slots, weight)
+        sendCreateDiscord(source, name, "Created Evidence", evidenceID)
+      end
     elseif Config.Framework == 'QBCore' then
-      local xPlayer = Core.Functions.GetPlayer(source)
-      local name = xPlayer.PlayerData.charinfo.firstname..' '..xPlayer.PlayerData.charinfo.lastname
-      local id = evidenceID
-      local label = evidenceID
-      local slots = 25
-      local maxWeight = 5000
+      if Config.Inventory == 'ox' then
+          local xPlayer = Core.Functions.GetPlayer(source)
+          local name = xPlayer.PlayerData.charinfo.firstname..' '..xPlayer.PlayerData.charinfo.lastname
+          local id = evidenceID
+          local label = evidenceID
+          local slots = 25
+          local maxWeight = 5000
 
-      ox_inventory:RegisterStash(id, label, slots, maxWeight, nil, false, nil)
-      sendCreateDiscord(source, name, "Created Evidence", evidenceID)
+          ox_inventory:RegisterStash(id, label, slots, maxWeight, nil, false, nil)
+          sendCreateDiscord(source, name, "Created Evidence", evidenceID)
+        elseif Config.Inventory == 'qs' then
+          local stash = evidenceID
+          local slots = 25
+          local weight = 5000
+          exports['qs-inventory']:RegisterStash(source, stash, slots, weight)
+          sendCreateDiscord(source, name, "Created Evidence", evidenceID)
+        end
     end
 end)
 
@@ -266,4 +282,15 @@ RegisterNetEvent('SickEvidence:loadStashes', function(id)
           ox_inventory:RegisterStash(id, id, 50, 100000)
         end
     end)
+end)
+
+RegisterNetEvent('SickLockers:OpenInvQB')
+AddEventHandler('SickLockers:OpenInvQB',function(evidenceID)
+  if Config.inventory == 'qs' then
+    TriggerServerEvent("inventory:server:OpenInventory", "stash", evidenceID)
+  else
+    local inventoryName = evidenceID
+    local data = { label = evidenceID, maxweight = 400000, slots = 500 }
+    exports['qb-inventory']:OpenInventory(source, inventoryName, data)
+  end
 end)
