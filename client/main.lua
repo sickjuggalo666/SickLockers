@@ -128,7 +128,7 @@ local function isGang(gang)
 end
 
 local function OpenGangLocker(gang)
-	if Config.inventory == 'qb' then
+	if Config.inventory == 'qb' or Config.inventory == 'qs' then
 		TriggerServerEvent('SickLockers:OpenInvQB', string.upper(gang))
 	elseif Config.inventory == 'ox' then
 		TriggerServerEvent("SickEvidence:createGangLocker", string.upper(gang))
@@ -140,7 +140,7 @@ end
 local function OpenPersonalGangLocker()
 	local Player = Core.Functions.GetPlayerData()
 	local name = string.upper(Player.gang.name)..': '..Player.charinfo.firstname
-	if Config.inventory == 'qb' then
+	if Config.inventory == 'qb' or Config.inventory == 'qs' then
 		TriggerServerEvent('SickLockers:OpenInvQB', name)
 	elseif Config.inventory == 'ox' then
 		TriggerServerEvent("SickEvidence:createGangLocker", name)
@@ -421,7 +421,7 @@ AddEventHandler('SickEvidence:confirmorcancel',function(args)
 			--TriggerServerEvent('SickEvidence:loadStashes', evidenceID)
 			Wait(1000)
 			ox_inventory:openInventory('Stash', evidenceID)
-		elseif Config.inventory == 'qb' then
+		elseif Config.inventory == 'qb'  or Config.inventory == 'qs' then
 			TriggerServerEvent('SickLockers:OpenInvQB', evidenceID)
 		end
 	end
@@ -643,7 +643,7 @@ AddEventHandler('SickEvidence:confirmLocker', function(args)
 end)
 
 local function lockerOption(lockerID)
-	if Config.inventory == 'qb' then
+	if Config.inventory == 'qb' or Config.inventory == 'qs'then
 		TriggerServerEvent('SickLockers:OpenInvQB', lockerID)
 	elseif Config.inventory == 'ox' then
 		lib.registerContext({
@@ -780,7 +780,7 @@ AddEventHandler('SickEvidence:lockerCallbackEvent', function()
 		Core.Functions.TriggerCallback('SickEvidence:getPlayerName', function(data)
 			if data then
 				local lockerID = ("LEO: "..data.firstname.." "..data.lastname)
-				if Config.inventory == 'qb' then
+				if Config.inventory == 'qb' or Config.inventory == 'qs' then
 					TriggerServerEvent('SickLockers:OpenInvQB', lockerID)
 				elseif Config.inventory == 'ox' then
 					Core.Functions.TriggerCallback('SickEvidence:getLocker', function(locker)
@@ -944,7 +944,7 @@ AddEventHandler('SickEvidence:ChiefLookup', function()
 			end
 		end, lockerID)
 	elseif Config.Framework == 'QBCore' then
-		if Config.inventory == 'qb' then
+		if Config.inventory == 'qb' or Config.inventory == 'qs' then
 			TriggerServerEvent('SickLockers:OpenInvQB', lockerID)
 		elseif Config.inventory == 'ox' then
 			Core.Functions.TriggerCallback('SickEvidence:getInventory', function(exists)
@@ -1219,7 +1219,7 @@ AddEventHandler('SickEvidence:OtherlockerCallbackEvent', function()
 		Core.Functions.TriggerCallback('SickEvidence:getPlayerName', function(data)
 			if data then
 				local OtherlockerID = (PlayerData.job.name.. ": " ..data.firstname.." "..data.lastname)
-				if Config.inventory == 'qb' then
+				if Config.inventory == 'qb' or Config.inventory == 'qs' then
 					TriggerServerEvent('SickLockers:OpenInvQB', OtherlockerID)
 				elseif Config.inventory == 'ox' then
 					Core.Functions.TriggerCallback('SickEvidence:getOtherInventories', function(Otherlocker)
