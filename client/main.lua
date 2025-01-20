@@ -68,7 +68,8 @@ local function refreshjob()
 end
 
 for k, v in pairs(Config.location) do
-	if not Config.Target == 'qb-target' then
+	print(Config.Target)
+	if Config.Target == 'ox_target' then
 		if v.UsePed == true then
 			local hash = GetHashKey(v.ped)
 			if not HasModelLoaded(hash) then
@@ -418,15 +419,17 @@ AddEventHandler('SickEvidence:confirmorcancel',function(args)
 		local evidenceID = args.inventory
 		if Config.inventory == 'ox' then
 			TriggerServerEvent("SickEvidence:createInventory", evidenceID)
-			--TriggerServerEvent('SickEvidence:loadStashes', evidenceID)
-			Wait(1000)
-			ox_inventory:openInventory('Stash', evidenceID)
 		elseif Config.inventory == 'qb'  or Config.inventory == 'qs' then
 			TriggerServerEvent('SickLockers:OpenInvQB', evidenceID)
 		end
 	end
 end)
 
+RegisterNetEvent("SickLockers:OpenInvOX")
+AddEventHandler('SickLockers:OpenInvOX',function(id)
+	print('Opening ID: '..id)
+	ox_inventory:openInventory('stash', id)
+end)
 --[[RegisterNetEvent('SickEvidence:OpenHeistMenu')
 AddEventHandler('SickEvidence:OpenHeistMenu', function()
 	local input = lib.inputDialog('LSPD Evidence', {'Incident Number (#...)'})

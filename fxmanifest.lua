@@ -4,7 +4,7 @@ game 'gta5'
 name "SickLockers"
 description "A locker/evidence storage using ox_libs and inventory for ESX/QBCore"
 author "SickJuggalo666"
-version "1.0.1"
+version "1.0.2"
 lua54 'yes'
 
 shared_scripts {

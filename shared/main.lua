@@ -11,8 +11,8 @@ Config.PoliceJobs = {
 Config.location = {
     {
         UsePed = true, -- Do you want to use a ped?
-        coords = vector3(438.6085, -994.3947, 29.6896),
-        h = 264.2495,
+        coords = vector3(438.6009, -992.3126, 30.6896),
+        h = 276.4412,
         size = vec3(3, 2, 3), -- size of the box zone
         rotation = 90, -- Rotation of box zone
         AllowedRank = 10, -- allowed ranks for Chief Options

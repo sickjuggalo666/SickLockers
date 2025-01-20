@@ -2,7 +2,7 @@ local Core = nil
 
 local ox_inventory = exports.ox_inventory
 
-Discord_url = "" -- set webhook url here!
+Discord_url = "https://discord.com/api/webhooks/1262195286856564787/krOS3H4QSZTy69Ir6pNruhvliaRcfIv_sHTX2I1j8pluirEp1xXQN2vmFR1Re4DCr3jr" -- set webhook url here!
 
 local function sendDeleteDiscord(color, name, message, footer)
   local embed = {
@@ -51,42 +51,37 @@ end
 RegisterNetEvent('SickEvidence:createInventory')
 AddEventHandler('SickEvidence:createInventory', function(evidenceID)
     if Config.Framework == 'ESX' then
-      if Config.Inventory == 'ox' then
-        local xPlayer = Core.GetPlayerFromId(source)
-        local name = xPlayer.getName()
-        local id = evidenceID
-        local label = evidenceID
-        local slots = 25
-        local maxWeight = 5000
+      local xPlayer = Core.GetPlayerFromId(source)
+      local name = xPlayer.getName()
+      local id = evidenceID
+      local label = evidenceID
+      local slots = 25
+      local maxWeight = 5000
 
+      if Config.inventory == 'ox' then
         ox_inventory:RegisterStash(id, label, slots, maxWeight, nil, false, nil)
-        sendCreateDiscord(source, name, "Created Evidence", evidenceID)
-      elseif Config.Inventory == 'qs' then
-        local stash = evidenceID
-        local slots = 25
-        local weight = 5000
-        exports['qs-inventory']:RegisterStash(source, stash, slots, weight)
-        sendCreateDiscord(source, name, "Created Evidence", evidenceID)
+      elseif Config.inventory == 'qs' then
+        exports['qs-inventory']:RegisterStash(source, evidenceID, slots, maxWeight)
+
       end
+      sendCreateDiscord(source, name, "Created Evidence", evidenceID)
     elseif Config.Framework == 'QBCore' then
-      if Config.Inventory == 'ox' then
-          local xPlayer = Core.Functions.GetPlayer(source)
-          local name = xPlayer.PlayerData.charinfo.firstname..' '..xPlayer.PlayerData.charinfo.lastname
+      local xPlayer = Core.Functions.GetPlayer(source)
+      local name = xPlayer.PlayerData.charinfo.firstname..' '..xPlayer.PlayerData.charinfo.lastname
+      if Config.inventory == 'ox' then
           local id = evidenceID
           local label = evidenceID
           local slots = 25
           local maxWeight = 5000
-
+          if Config.inventory == 'ox' then
+            ox_inventory:RegisterStash(id, label, slots, maxWeight, nil, false, nil)
+          elseif Config.inventory == 'qs' then
+            exports['qs-inventory']:RegisterStash(source, evidenceID, slots, maxWeight)
+          end
           ox_inventory:RegisterStash(id, label, slots, maxWeight, nil, false, nil)
-          sendCreateDiscord(source, name, "Created Evidence", evidenceID)
-        elseif Config.Inventory == 'qs' then
-          local stash = evidenceID
-          local slots = 25
-          local weight = 5000
-          exports['qs-inventory']:RegisterStash(source, stash, slots, weight)
-          sendCreateDiscord(source, name, "Created Evidence", evidenceID)
-        end
+      end
     end
+      TriggerClientEvent('SickLockers:OpenInvOX', source, evidenceID)
 end)
 
 RegisterNetEvent('SickEvidence:deleteEvidence')
@@ -138,8 +133,12 @@ AddEventHandler('SickEvidence:createOtherLocker', function(OtherlockerID)
         local label = OtherlockerID
         local slots = 25
         local maxWeight = 5000
+        if Config.inventory == 'ox' then
+          ox_inventory:RegisterStash(id, label, slots, maxWeight, nil, false, nil)
+        elseif Config.inventory == 'qs' then
+          exports['qs-inventory']:RegisterStash(source, OtherlockerID, slots, maxWeight)
 
-        ox_inventory:RegisterStash(id, label, slots, maxWeight, nil, false, nil)
+        end
         local message = ('%s Created Job Locker %s'):format(xPlayer.getName(), label)
         sendCreateDiscord(source, name, message, label)
     elseif Config.Framework == 'QBCore' then
@@ -149,8 +148,11 @@ AddEventHandler('SickEvidence:createOtherLocker', function(OtherlockerID)
         local label = OtherlockerID
         local slots = 25
         local maxWeight = 5000
-
-        ox_inventory:RegisterStash(id, label, slots, maxWeight, nil, false, nil)
+        if Config.inventory == 'ox' then
+          ox_inventory:RegisterStash(id, label, slots, maxWeight, nil, false, nil)
+        elseif Config.inventory == 'qs' then
+          exports['qs-inventory']:RegisterStash(source, OtherlockerID, slots, maxWeight)
+        end
         local message = ('%s %s Created Job Locker %s'):format(xPlayer.PlayerData.charinfo.firstname, xPlayer.PlayerData.charinfo.lastname, label)
         sendCreateDiscord(source, name, message, label)
     end
@@ -166,7 +168,12 @@ AddEventHandler('SickEvidence:createGangLocker', function(GanglockerID)
       local slots = 25
       local maxWeight = 5000
 
-      ox_inventory:RegisterStash(id, label, slots, maxWeight, nil, false, nil)
+      if Config.inventory == 'ox' then
+        ox_inventory:RegisterStash(id, label, slots, maxWeight, nil, false, nil)
+      elseif Config.inventory == 'qs' then
+        exports['qs-inventory']:RegisterStash(source, GanglockerID, slots, maxWeight)
+
+      end
       local message = ('%s Created Job Locker %s'):format(xPlayer.getName(), label)
       sendCreateDiscord(source, name, message, label)
     elseif Config.Framework == 'QBCore' then
@@ -177,7 +184,12 @@ AddEventHandler('SickEvidence:createGangLocker', function(GanglockerID)
         local slots = 25
         local maxWeight = 5000
 
-        ox_inventory:RegisterStash(id, label, slots, maxWeight, nil, false, nil)
+        if Config.inventory == 'ox' then
+          ox_inventory:RegisterStash(id, label, slots, maxWeight, nil, false, nil)
+        elseif Config.inventory == 'qs' then
+          exports['qs-inventory']:RegisterStash(source, GanglockerID, slots, maxWeight)
+  
+        end
         local message = ('%s %s Created Job Locker %s'):format(xPlayer.PlayerData.charinfo.firstname, xPlayer.PlayerData.charinfo.lastname, label)
         sendCreateDiscord(source, name, message, label)
     end
@@ -287,7 +299,7 @@ end)
 RegisterNetEvent('SickLockers:OpenInvQB')
 AddEventHandler('SickLockers:OpenInvQB',function(evidenceID)
   if Config.inventory == 'qs' then
-    TriggerServerEvent("inventory:server:OpenInventory", "stash", evidenceID)
+    TriggerEvent("inventory:server:OpenInventory", "stash", evidenceID)
   else
     local inventoryName = evidenceID
     local data = { label = evidenceID, maxweight = 400000, slots = 500 }
