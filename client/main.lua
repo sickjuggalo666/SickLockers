@@ -134,7 +134,7 @@ local function OpenGangLocker(gang)
 	elseif Config.inventory == 'ox' then
 		TriggerServerEvent("SickEvidence:createGangLocker", string.upper(gang))
 		Wait(1000)
-	    ox_inventory:openInventory('Stash', string.upper(gang))
+	    ox_inventory:openInventory('stash', string.upper(gang))
 	end
 end
 
@@ -146,7 +146,7 @@ local function OpenPersonalGangLocker()
 	elseif Config.inventory == 'ox' then
 		TriggerServerEvent("SickEvidence:createGangLocker", name)
 		Wait(1000)
-	    ox_inventory:openInventory('Stash', name)
+	    ox_inventory:openInventory('stash', name)
 	end
 end
 
@@ -629,7 +629,7 @@ AddEventHandler('SickEvidence:evidenceOptions', function(args)
 		local evidenceID = args.inventory
 		TriggerServerEvent('SickEvidence:loadStashes', evidenceID)
 		Wait(1000)
-	    ox_inventory:openInventory('Stash', evidenceID)
+	    ox_inventory:openInventory('stash', evidenceID)
 	end
 end)
 
@@ -641,7 +641,7 @@ AddEventHandler('SickEvidence:confirmLocker', function(args)
 		local lockerID = args.inventory
 		TriggerServerEvent("SickEvidence:createLocker", lockerID)
 		Wait(1000)
-	    ox_inventory:openInventory('Stash', lockerID)
+	    ox_inventory:openInventory('stash', lockerID)
 	end
 end)
 
@@ -697,7 +697,7 @@ AddEventHandler('SickEvidence:lockerOptions', function(args)
 		local lockerID = args.inventory
 		TriggerServerEvent('SickEvidence:loadStashes', lockerID)
 		Wait(1000)
-	    ox_inventory:openInventory('Stash', lockerID)
+	    ox_inventory:openInventory('stash', lockerID)
 	end
 end)
 
@@ -1112,7 +1112,7 @@ AddEventHandler('SickEvidence:ChieflockerOptions', function(args)
 		local lockerID = args.inventory
 		TriggerServerEvent('SickEvidence:loadStashes', lockerID)
 		Wait(1000)
-	    ox_inventory:openInventory('Stash', lockerID)
+	    ox_inventory:openInventory('stash', lockerID)
 	end
 end)
 
@@ -1141,7 +1141,7 @@ AddEventHandler('SickEvidence:OtherlockerOptions', function(args)
 		local OtherlockerID = args.inventory
 		TriggerServerEvent('SickEvidence:loadStashes', OtherlockerID)
 		Wait(1000)
-	    ox_inventory:openInventory('Stash', OtherlockerID)
+	    ox_inventory:openInventory('stash', OtherlockerID)
 	end
 end)
 
@@ -1304,6 +1304,6 @@ AddEventHandler('SickEvidence:confirmorcancelOthers', function(args)
 		TriggerServerEvent("SickEvidence:createOtherLocker", OtherlockerID)
 		TriggerServerEvent('SickEvidence:loadStashes', OtherlockerID)
 		Wait(1000)
-	    ox_inventory:openInventory('Stash', OtherlockerID)
+	    ox_inventory:openInventory('stash', OtherlockerID)
 	end
 end)
