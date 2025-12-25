@@ -387,95 +387,96 @@ for k,v in pairs(Config.location) do
 		break
 	end
 end
+if Config.Menus == 'ox' then
+	lib.registerContext({
+		id = 'chiefmenu',
+		title = 'Big Chief Shit!',
+		options = {
+			{
+				title = 'Chief Options',
+				description = 'Chief Options',
+				arrow = true,
+				event = 'SickEvidence:ChiefMenu',
+			},
+			{
+				title = 'Open Locker Room',
+				description = 'Open Locker Room',
+				arrow = true,
+				event = 'SickEvidence:lockerCallbackEvent',
+			},
+			{
+				title = 'Open Evidence',
+				description = 'Open Evidence Locker',
+				arrow = true,
+				event = 'SickEvidence:triggerEvidenceMenu',
+			}
+		},
+	})
 
-lib.registerContext({
-	id = 'chiefmenu',
-	title = 'Big Chief Shit!',
-	options = {
-		{
-			title = 'Chief Options',
-			description = 'Chief Options',
-			arrow = true,
-			event = 'SickEvidence:ChiefMenu',
+
+	lib.registerContext({
+		id = 'openInventory',
+		title = 'Evidence Lockers!',
+		options = {
+			{
+				title = 'Open Locker Room',
+				description = 'Open Locker Room',
+				arrow = true,
+				event = 'SickEvidence:lockerCallbackEvent',
+			},
+			{
+				title = 'Open Evidence',
+				description = 'Open Evidence Locker',
+				arrow = true,
+				event = 'SickEvidence:triggerEvidenceMenu',
+			}
 		},
-		{
-			title = 'Open Locker Room',
-			description = 'Open Locker Room',
-			arrow = true,
-			event = 'SickEvidence:lockerCallbackEvent',
-		},
-		{
-			title = 'Open Evidence',
-			description = 'Open Evidence Locker',
-			arrow = true,
-			event = 'SickEvidence:triggerEvidenceMenu',
+	})
+elseif Config.Menus == 'lation' then
+	exports.lation_ui:registerMenu({
+		id = 'chiefmenu',
+		title = 'Big Chief Shit!',
+		options = {
+			{
+				title = 'Chief Options',
+				description = 'Chief Options',
+				arrow = true,
+				event = 'SickEvidence:ChiefMenu',
+			},
+			{
+				title = 'Open Locker Room',
+				description = 'Open Locker Room',
+				arrow = true,
+				event = 'SickEvidence:lockerCallbackEvent',
+			},
+			{
+				title = 'Open Evidence',
+				description = 'Open Evidence Locker',
+				arrow = true,
+				event = 'SickEvidence:triggerEvidenceMenu',
+			}
 		}
-	},
-})
+	})
 
-lib.registerContext({
-	id = 'openInventory',
-	title = 'Evidence Lockers!',
-	options = {
-		{
-			title = 'Open Locker Room',
-			description = 'Open Locker Room',
-			arrow = true,
-			event = 'SickEvidence:lockerCallbackEvent',
-		},
-		{
-			title = 'Open Evidence',
-			description = 'Open Evidence Locker',
-			arrow = true,
-			event = 'SickEvidence:triggerEvidenceMenu',
+	exports.lation_ui:registerMenu({
+		id = 'openInventory',
+		title = 'Evidence Lockers!',
+		options = {
+			{
+				title = 'Open Locker Room',
+				description = 'Open Locker Room',
+				arrow = true,
+				event = 'SickEvidence:lockerCallbackEvent',
+			},
+			{
+				title = 'Open Evidence',
+				description = 'Open Evidence Locker',
+				arrow = true,
+				event = 'SickEvidence:triggerEvidenceMenu',
+			}
 		}
-	},
-})
-
-exports.lation_ui:registerMenu({
-	id = 'chiefmenu',
-	title = 'Big Chief Shit!',
-	options = {
-		{
-			title = 'Chief Options',
-			description = 'Chief Options',
-			arrow = true,
-			event = 'SickEvidence:ChiefMenu',
-		},
-		{
-			title = 'Open Locker Room',
-			description = 'Open Locker Room',
-			arrow = true,
-			event = 'SickEvidence:lockerCallbackEvent',
-		},
-		{
-			title = 'Open Evidence',
-			description = 'Open Evidence Locker',
-			arrow = true,
-			event = 'SickEvidence:triggerEvidenceMenu',
-		}
-	}
-})
-
-exports.lation_ui:registerMenu({
-	id = 'openInventory',
-	title = 'Evidence Lockers!',
-	options = {
-		{
-			title = 'Open Locker Room',
-			description = 'Open Locker Room',
-			arrow = true,
-			event = 'SickEvidence:lockerCallbackEvent',
-		},
-		{
-			title = 'Open Evidence',
-			description = 'Open Evidence Locker',
-			arrow = true,
-			event = 'SickEvidence:triggerEvidenceMenu',
-		}
-	}
-})
-
+	})
+end
 
 --[[lib.registerContext({
 	id = 'openHeistInv',
@@ -493,26 +494,57 @@ exports.lation_ui:registerMenu({
 RegisterNetEvent('SickEvidence:openInventory')
 AddEventHandler('SickEvidence:openInventory',function(isHeist)
 	refreshjob()
+	print('Triggered')
 	if Config.Framework == 'ESX' then
 		for k,v in pairs(Config.location) do
 			if v.cop == true and v.job == PlayerData.job.name and PlayerData.job.grade >= v.AllowedRank then
-				lib.showContext('chiefmenu')
+				print(Config.Menus)
+				if Config.Menus == 'ox' then
+					print('OX')
+					lib.showContext('chiefmenu')
+				elseif Config.Menus == 'lation' then
+					exports.lation_ui:showMenu('chiefmenu')
+				end
 			elseif v.cop == true and v.job == PlayerData.job.name then
-				lib.showContext('openInventory')
+				if Config.Menus == 'ox' then
+					lib.showContext('openInventory')
+				elseif Config.Menus == 'lation' then
+					exports.lation_ui:showMenu('openInventory')
+				end
 			elseif v.cop == false and v.job == PlayerData.job.name then
-				lib.showContext('other_lockers')
+				if Config.Menus == 'ox' then
+					lib.showContext('other_lockers')
+				elseif Config.Menus == 'lation' then
+					exports.lation_ui:showMenu('other_lockers')
+				end
 			--[[elseif isHeist then
 				lib.showContext('openHeistInv')]]
 			end
 		end
 	elseif Config.Framework == 'QBCore' then
+		print('QB')
 		for k,v in pairs(Config.location) do
+			print('looping')
+			print(v.cop, v.job, PlayerData.job.name , PlayerData.job.grade.level , v.AllowedRank)
 			if v.cop == true and v.job == PlayerData.job.name and PlayerData.job.grade.level >= v.AllowedRank then
-				lib.showContext('chiefmenu')
+				print(Config.Menus)
+				if Config.Menus == 'ox' then
+					lib.showContext('chiefmenu')
+				elseif Config.Menus == 'lation' then
+					exports.lation_ui:showMenu('chiefmenu')
+				end
 			elseif v.cop == true and v.job == PlayerData.job.name then
-				lib.showContext('openInventory')
+				if Config.Menus == 'ox' then
+					lib.showContext('openInventory')
+				elseif Config.Menus == 'lation' then
+					exports.lation_ui:showMenu('openInventory')
+				end
 			elseif v.cop == false and v.job == PlayerData.job.name then
-				lib.showContext('other_lockers')
+				if Config.Menus == 'ox' then
+					lib.showContext('other_lockers')
+				elseif Config.Menus == 'lation' then
+					exports.lation_ui:showMenu('other_lockers')
+				end
 			--[[elseif isHeist then
 				lib.showContext('openHeistInv')]]
 			end
@@ -1478,7 +1510,7 @@ AddEventHandler('SickEvidence:ChiefLookup', function()
 				{
 					type = 'input',
 					label = 'First Name',
-					description = 'Input your First Name below',
+					description = 'Input First Name below',
 					placeholder = 'Jack',
 					icon = 'fas fa-user',
 					required = true
@@ -1486,7 +1518,7 @@ AddEventHandler('SickEvidence:ChiefLookup', function()
 				{
 					type = 'input',
 					label = 'Last Name',
-					description = 'Input your Last Name below',
+					description = 'Input Last Name below',
 					placeholder = 'Napier',
 					icon = 'fas fa-user',
 					required = true
