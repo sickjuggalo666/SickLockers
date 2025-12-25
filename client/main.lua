@@ -53,7 +53,27 @@ local function Notify(type,title, message)
                     type = 'error'
                 })
             end
-    elseif Config.NotificationType.Client == 'custom' then
+    elseif Config.NotificationType.Client == 'lation' then
+		if type == 1 then
+			exports.lation_ui:notify({
+				title = title,
+				message = message,
+				type = 'success',
+			})
+		elseif type == 2 then
+			exports.lation_ui:notify({
+				title = title,
+				message = message,
+				type = 'info',
+			})
+		elseif type == 3 then
+			exports.lation_ui:notify({
+				title = title,
+				message = message,
+				type = 'error',
+			})
+		end
+	elseif Config.NotificationType.Client == 'custom' then
 
     end
 end
@@ -155,48 +175,93 @@ AddEventHandler('SickLockers:OpenGangLocker', function(k)
 	local Player = Core.Functions.GetPlayerData()
 	if Player.gang.name == k.gang then
 		if Player.gang['grade'].level >= k.AllowedRank then
-			lib.registerContext({
-				id = 'GangInventory',
-				title = 'Gang Lockers!',
-				options = {
-					{
-						title = 'Open Gang Locker',
-						description = 'Open Gang Locker',
-						arrow = true,
-						event = 'SickEvidence:OpenGangLocker',
-						onSelect = function()
-							OpenGangLocker(k.gang)
-						end
+			if Config.Menus == 'ox' then
+				lib.registerContext({
+					id = 'GangInventory',
+					title = 'Gang Lockers!',
+					options = {
+						{
+							title = 'Open Gang Locker',
+							description = 'Open Gang Locker',
+							arrow = true,
+							onSelect = function()
+								OpenGangLocker(k.gang)
+							end
+						},
+						{
+							title = 'Open Personal Gang Locker',
+							description = 'Open Personal Gang Locker',
+							arrow = true,
+							onSelect = function()
+								OpenPersonalGangLocker()
+							end
+						}
 					},
-					{
-						title = 'Open Personal Gang Locker',
-						description = 'Open Personal Gang Locker',
-						arrow = true,
-						event = 'SickEvidence:OpenPersonalGangLocker',
-						onSelect = function()
-							OpenPersonalGangLocker()
-						end
+				})
+				lib.showContext('GangInventory')
+			elseif Config.Menus == 'lation' then
+				-- Register main menu
+				exports.lation_ui:registerMenu({
+					id = 'GangInventory',
+					title = 'Gang Lockers!',
+					options = {
+						{
+							title = 'Open Gang Locker',
+							icon = 'fas fa-bars',
+							onSelect = function()
+								OpenGangLocker(k.gang)
+							end
+						},
+						{
+							title = 'Open Personal Gang Locker',
+							icon = 'fas fa-ban',
+							onSelect = function()
+								OpenPersonalGangLocker()
+							end
+						},
 					}
-				},
-			})
-			lib.showContext('GangInventory')
+				})
+
+				-- Show menu
+				exports.lation_ui:showMenu('GangInventory')
+			end
 		elseif Config.PoliceJobs[Player.job.name] then
-			lib.registerContext({
-				id = 'PoliceRaidInventory',
-				title = 'Gang Lockers!',
-				options = {
-					{
-						title = 'Open Gang Locker',
-						description = 'Open Gang Locker',
-						arrow = true,
-						event = 'SickEvidence:OpenGangLocker',
-						onSelect = function()
-							OpenGangLocker(k.gang)
-						end
+			if Config.Menus == 'ox' then
+				lib.registerContext({
+					id = 'PoliceRaidInventory',
+					title = 'Gang Lockers!',
+					options = {
+						{
+							title = 'Open Gang Locker',
+							description = 'Open Gang Locker',
+							arrow = true,
+							event = 'SickEvidence:OpenGangLocker',
+							onSelect = function()
+								OpenGangLocker(k.gang)
+							end
+						}
+					},
+				})
+				lib.showContext('PoliceRaidInventory')
+			elseif Config.Menus == 'lation' then
+				-- Register main menu
+				exports.lation_ui:registerMenu({
+					id = 'PoliceRaidInventory',
+					title = 'Gang Lockers!',
+					options = {
+						{
+							title = 'Open Gang Locker',
+							icon = 'fas fa-bars',
+							onSelect = function()
+								OpenGangLocker(k.gang)
+							end
+						}
 					}
-				},
-			})
-			lib.showContext('PoliceRaidInventory')
+				})
+
+				-- Show menu
+				exports.lation_ui:showMenu('GangInventory')
+			end
 		end
 	end
 end)
@@ -367,6 +432,50 @@ lib.registerContext({
 	},
 })
 
+exports.lation_ui:registerMenu({
+	id = 'chiefmenu',
+	title = 'Big Chief Shit!',
+	options = {
+		{
+			title = 'Chief Options',
+			description = 'Chief Options',
+			arrow = true,
+			event = 'SickEvidence:ChiefMenu',
+		},
+		{
+			title = 'Open Locker Room',
+			description = 'Open Locker Room',
+			arrow = true,
+			event = 'SickEvidence:lockerCallbackEvent',
+		},
+		{
+			title = 'Open Evidence',
+			description = 'Open Evidence Locker',
+			arrow = true,
+			event = 'SickEvidence:triggerEvidenceMenu',
+		}
+	}
+})
+
+exports.lation_ui:registerMenu({
+	id = 'openInventory',
+	title = 'Evidence Lockers!',
+	options = {
+		{
+			title = 'Open Locker Room',
+			description = 'Open Locker Room',
+			arrow = true,
+			event = 'SickEvidence:lockerCallbackEvent',
+		},
+		{
+			title = 'Open Evidence',
+			description = 'Open Evidence Locker',
+			arrow = true,
+			event = 'SickEvidence:triggerEvidenceMenu',
+		}
+	}
+})
+
 
 --[[lib.registerContext({
 	id = 'openHeistInv',
@@ -430,6 +539,7 @@ AddEventHandler('SickLockers:OpenInvOX',function(id)
 	print('Opening ID: '..id)
 	ox_inventory:openInventory('stash', id)
 end)
+
 --[[RegisterNetEvent('SickEvidence:OpenHeistMenu')
 AddEventHandler('SickEvidence:OpenHeistMenu', function()
 	local input = lib.inputDialog('LSPD Evidence', {'Incident Number (#...)'})
@@ -470,85 +580,16 @@ end)]] -- COMING SOON
 
 RegisterNetEvent('SickEvidence:triggerEvidenceMenu')
 AddEventHandler('SickEvidence:triggerEvidenceMenu', function()
-	local input = lib.inputDialog('LSPD Evidence', {'Incident Number (#...)'})
+	if Config.Menus == 'ox' then
+		local input = lib.inputDialog('LSPD Evidence', {'Incident Number (#...)'})
 
-	if not input then
-		lib.hideContext(false)
-		return
-	end
-	local evidenceID = ("Case: "..input[1]) --("Case :"..input[1]) -- if you have issues when updating.. changed format cause it just looks better
-	if Config.Framework == 'ESX' then
-		Core.TriggerServerCallback('SickEvidence:getInventory', function(exists)
-			if not exists then
-				lib.registerContext({
-					id = 'confirmCreate',
-					title = 'Confirm or Cancel',
-					options = {
-						{
-							title = 'Create New Evidence Inventory?',
-							description = 'Evidence Inventory System'
-						},
-						{
-							title = 'Confirm Creation?',
-							description = 'Create an Evidence Storage?',
-							arrow = true,
-							event = 'SickEvidence:confirmorcancel',
-							args = {
-								selection = 'confirm',
-								inventory = evidenceID
-							}
-						},
-						{
-							title = 'Cancel Creation?',
-							description = 'Cancel The Creation of this Evidence Storage?',
-							arrow = true,
-							event = 'SickEvidence:confirmorcancel',
-							args = {
-								selection = 'cancel'
-							}
-						}
-					},
-				})
-		
-				lib.showContext('confirmCreate')
-			else
-				lib.registerContext({
-					id = 'evidenceOption',
-					title = 'Evidence Options',
-					options = {
-						{
-							title = 'Evidence Delete/Open'
-						},
-						{
-							title = 'Open Evidence?',
-							description = 'Open Evidence Storage?',
-							arrow = true,
-							event = 'SickEvidence:evidenceOptions',
-							args = {
-								selection = "open",
-								inventory = evidenceID
-							}
-						},
-						{
-							title = 'Delete Inventory?',
-							description = 'Delete this Evidence Storage?',
-							arrow = true,
-							event = 'SickEvidence:evidenceOptions',
-							args = {
-								selection = "delete",
-								inventory = evidenceID
-							}
-						}
-					},
-				})
-				lib.showContext('evidenceOption')
-			end
-		end,evidenceID)
-	elseif Config.Framework == 'QBCore' then
-		if Config.inventory == 'qb' or Config.inventory == 'qs' then
-			TriggerServerEvent('SickLockers:OpenInvQB', evidenceID)
-		elseif Config.inventory == 'ox' then
-			Core.Functions.TriggerCallback('SickEvidence:getInventory', function(exists)
+		if not input then
+			lib.hideContext(false)
+			return
+		end
+		local evidenceID = ("Case: "..input[1]) --("Case :"..input[1]) -- if you have issues when updating.. changed format cause it just looks better
+		if Config.Framework == 'ESX' then
+			Core.TriggerServerCallback('SickEvidence:getInventory', function(exists)
 				if not exists then
 					lib.registerContext({
 						id = 'confirmCreate',
@@ -579,7 +620,7 @@ AddEventHandler('SickEvidence:triggerEvidenceMenu', function()
 							}
 						},
 					})
-			
+
 					lib.showContext('confirmCreate')
 				else
 					lib.registerContext({
@@ -613,7 +654,241 @@ AddEventHandler('SickEvidence:triggerEvidenceMenu', function()
 					})
 					lib.showContext('evidenceOption')
 				end
-			end, evidenceID)
+			end,evidenceID)
+		elseif Config.Framework == 'QBCore' then
+			if Config.inventory == 'qb' or Config.inventory == 'qs' then
+				TriggerServerEvent('SickLockers:OpenInvQB', evidenceID)
+			elseif Config.inventory == 'ox' then
+				Core.Functions.TriggerCallback('SickEvidence:getInventory', function(exists)
+					if not exists then
+						if Config.Menus == 'ox' then
+							lib.registerContext({
+								id = 'confirmCreate',
+								title = 'Confirm or Cancel',
+								options = {
+									{
+										title = 'Create New Evidence Inventory?',
+										description = 'Evidence Inventory System'
+									},
+									{
+										title = 'Confirm Creation?',
+										description = 'Create an Evidence Storage?',
+										arrow = true,
+										event = 'SickEvidence:confirmorcancel',
+										args = {
+											selection = 'confirm',
+											inventory = evidenceID
+										}
+									},
+									{
+										title = 'Cancel Creation?',
+										description = 'Cancel The Creation of this Evidence Storage?',
+										arrow = true,
+										event = 'SickEvidence:confirmorcancel',
+										args = {
+											selection = 'cancel'
+										}
+									}
+								},
+							})
+
+							lib.showContext('confirmCreate')
+						elseif Config.Menus == 'lation' then
+
+						end
+					else
+						lib.registerContext({
+							id = 'evidenceOption',
+							title = 'Evidence Options',
+							options = {
+								{
+									title = 'Evidence Delete/Open'
+								},
+								{
+									title = 'Open Evidence?',
+									description = 'Open Evidence Storage?',
+									arrow = true,
+									event = 'SickEvidence:evidenceOptions',
+									args = {
+										selection = "open",
+										inventory = evidenceID
+									}
+								},
+								{
+									title = 'Delete Inventory?',
+									description = 'Delete this Evidence Storage?',
+									arrow = true,
+									event = 'SickEvidence:evidenceOptions',
+									args = {
+										selection = "delete",
+										inventory = evidenceID
+									}
+								}
+							},
+						})
+						lib.showContext('evidenceOption')
+					end
+				end, evidenceID)
+			end
+		end
+	elseif Config.Menus == 'lation' then
+
+		local input = exports.lation_ui:input({
+			title = "LSPD Evidence",
+			subtitle = "Enter locker number",
+			submitText = "Open",
+			options = {
+				{
+					type = 'number',
+					label = 'Locker #',
+					description = 'Input the wanted evidence locker',
+					placeholder = '6669',
+					icon = 'fas fa-user',
+					required = true
+				},
+			}
+		})
+		if not input then
+			exports.lation_ui:hideText()
+			return
+		end
+		local evidenceID = ("Case: "..input[1])
+		if Config.Framework == 'ESX' then
+			Core.TriggerServerCallback('SickEvidence:getInventory', function(exists)
+				if not exists then
+					exports.lation_ui:registerMenu({
+						id = 'confirmCreate',
+						title = 'Confirm or Cancel',
+						options = {
+							{
+								title = 'Create New Evidence Inventory?',
+								description = 'Evidence Inventory System'
+							},
+							{
+								title = 'Confirm Creation?',
+								description = 'Create an Evidence Storage?',
+								arrow = true,
+								event = 'SickEvidence:confirmorcancel',
+								args = {
+									selection = 'confirm',
+									inventory = evidenceID
+								}
+							},
+							{
+								title = 'Cancel Creation?',
+								description = 'Cancel The Creation of this Evidence Storage?',
+								arrow = true,
+								event = 'SickEvidence:confirmorcancel',
+								args = {
+									selection = 'cancel'
+								}
+							}
+						}
+					})
+					exports.lation_ui:showMenu('confirmCreate')
+				else
+					exports.lation_ui:registerMenu({
+						id = 'evidenceOption',
+						title = 'Evidence Options',
+						options = {
+							{
+								title = 'Evidence Delete/Open'
+							},
+							{
+								title = 'Open Evidence?',
+								description = 'Open Evidence Storage?',
+								arrow = true,
+								event = 'SickEvidence:evidenceOptions',
+								args = {
+									selection = "open",
+									inventory = evidenceID
+								}
+							},
+							{
+								title = 'Delete Inventory?',
+								description = 'Delete this Evidence Storage?',
+								arrow = true,
+								event = 'SickEvidence:evidenceOptions',
+								args = {
+									selection = "delete",
+									inventory = evidenceID
+								}
+							}
+						}
+					})
+					exports.lation_ui:showMenu('evidenceOption')
+				end
+			end,evidenceID)
+		elseif Config.Framework == 'QBCore' then
+			if Config.inventory == 'qb' or Config.inventory == 'qs' then
+				TriggerServerEvent('SickLockers:OpenInvQB', evidenceID)
+			elseif Config.inventory == 'ox' then
+				Core.Functions.TriggerCallback('SickEvidence:getInventory', function(exists)
+					if not exists then
+						exports.lation_ui:registerMenu({
+							id = 'confirmCreate',
+							title = 'Confirm or Cancel',
+							options = {
+								{
+									title = 'Create New Evidence Inventory?',
+									description = 'Evidence Inventory System'
+								},
+								{
+									title = 'Confirm Creation?',
+									description = 'Create an Evidence Storage?',
+									arrow = true,
+									event = 'SickEvidence:confirmorcancel',
+									args = {
+										selection = 'confirm',
+										inventory = evidenceID
+									}
+								},
+								{
+									title = 'Cancel Creation?',
+									description = 'Cancel The Creation of this Evidence Storage?',
+									arrow = true,
+									event = 'SickEvidence:confirmorcancel',
+									args = {
+										selection = 'cancel'
+									}
+								}
+							}
+						})
+						exports.lation_ui:showMenu('confirmCreate')
+					else
+						exports.lation_ui:registerMenu({
+							id = 'evidenceOption',
+							title = 'Evidence Options',
+							options = {
+								{
+									title = 'Evidence Delete/Open'
+								},
+								{
+									title = 'Open Evidence?',
+									description = 'Open Evidence Storage?',
+									arrow = true,
+									event = 'SickEvidence:evidenceOptions',
+									args = {
+										selection = "open",
+										inventory = evidenceID
+									}
+								},
+								{
+									title = 'Delete Inventory?',
+									description = 'Delete this Evidence Storage?',
+									arrow = true,
+									event = 'SickEvidence:evidenceOptions',
+									args = {
+										selection = "delete",
+										inventory = evidenceID
+									}
+								}
+							}
+						})
+						exports.lation_ui:showMenu('evidenceOption')
+					end
+				end, evidenceID)
+			end
 		end
 	end
 end)
@@ -649,41 +924,78 @@ local function lockerOption(lockerID)
 	if Config.inventory == 'qb' or Config.inventory == 'qs'then
 		TriggerServerEvent('SickLockers:OpenInvQB', lockerID)
 	elseif Config.inventory == 'ox' then
-		lib.registerContext({
-			id = 'lockerOption',
-			title = 'Confirm or Cancel',
-			options = {
-				{
-					title = 'Locker Options',
-					description = 'Locker Delete/Open'
-				},
-				{
-					title = 'Open Locker?',
-					description = 'Open a Personal Locker?',
-					arrow = true,
-					event = 'SickEvidence:lockerOptions',
-					args = {
-						selection = 'open',
-						inventory = lockerID
+		if Config.Menus == 'ox' then
+			lib.registerContext({
+				id = 'lockerOption',
+				title = 'Confirm or Cancel',
+				options = {
+					{
+						title = 'Locker Options',
+						description = 'Locker Delete/Open'
 					},
-					metadata = {
-						{label = lockerID}
+					{
+						title = 'Open Locker?',
+						description = 'Open a Personal Locker?',
+						arrow = true,
+						event = 'SickEvidence:lockerOptions',
+						args = {
+							selection = 'open',
+							inventory = lockerID
+						},
+						metadata = {
+							{label = lockerID}
+						}
+					},
+					{
+						title = 'Delete Locker?',
+						description = 'Delete Your Personal Locker?',
+						arrow = true,
+						event = 'SickEvidence:confirmorcancel',
+						args = {
+							selection = "delete",
+							inventory = lockerID
+						}
 					}
 				},
-				{
-					title = 'Delete Locker?',
-					description = 'Delete Your Personal Locker?',
-					arrow = true,
-					event = 'SickEvidence:confirmorcancel',
-					args = {
-						selection = "delete",
-						inventory = lockerID
+			})
+
+			lib.showContext('lockerOption')
+		elseif Config.Menus == 'lation' then
+			exports.lation_ui:registerMenu({
+				id = 'lockerOption',
+				title = 'Confirm or Cancel',
+				options = {
+					{
+						title = 'Locker Options',
+						description = 'Locker Delete/Open'
+					},
+					{
+						title = 'Open Locker?',
+						description = 'Open a Personal Locker?',
+						arrow = true,
+						event = 'SickEvidence:lockerOptions',
+						args = {
+							selection = 'open',
+							inventory = lockerID
+						},
+						metadata = {
+							{label = "Locker: ", value = lockerID}
+						}
+					},
+					{
+						title = 'Delete Locker?',
+						description = 'Delete Your Personal Locker?',
+						arrow = true,
+						event = 'SickEvidence:confirmorcancel',
+						args = {
+							selection = "delete",
+							inventory = lockerID
+						}
 					}
 				}
-			},
-		})
-
-		lib.showContext('lockerOption')
+			})
+			exports.lation_ui:showMenu('lockerOption')
+		end
 	end
 end
 
@@ -709,34 +1021,413 @@ AddEventHandler('SickEvidence:lockerCallbackEvent', function()
 				local lockerID = ("LEO: "..data.firstname.." "..data.lastname)
 				Core.TriggerServerCallback('SickEvidence:getLocker', function(locker)
 					if locker then
-						lib.registerContext({
-							id = 'lockerCreate',
-							title = 'Confirm or Cancel',
-							menu = 'openInventory',
-							options = {
-								{
-									title = 'Create New Locker?',
-									description = 'Locker Inventory System'
+						if Config.Menus == 'ox' then
+							lib.registerContext({
+								id = 'lockerCreate',
+								title = 'Confirm or Cancel',
+								menu = 'openInventory',
+								options = {
+									{
+										title = 'Create New Locker?',
+										description = 'Locker Inventory System'
+									},
+									{
+										title = 'Confirm Creation?',
+										description = 'Create a Personal Locker?',
+										arrow = true,
+										event = 'SickEvidence:confirmLocker',
+										args = {selection = 'confirm', inventory = lockerID}
+									},
+									{
+										title = 'Cancel Creation?',
+										description = 'Cancel The Creation of this Personal Locker?',
+										arrow = true,
+										event = 'SickEvidence:confirmLocker',
+										args = {selection = 'cancel'}
+									}
 								},
-								{
-									title = 'Confirm Creation?',
-									description = 'Create a Personal Locker?',
-									arrow = true,
-									event = 'SickEvidence:confirmLocker',
-									args = {selection = 'confirm', inventory = lockerID}
+							})
+
+							lib.showContext('lockerCreate')
+						elseif Config.Menus == 'lation' then
+							exports.lation_ui:registerMenu({
+								id = 'lockerCreate',
+								title = 'Confirm or Cancel',
+								menu = 'openInventory',
+								options = {
+									{
+										title = 'Create New Locker?',
+										description = 'Locker Inventory System'
+									},
+									{
+										title = 'Confirm Creation?',
+										description = 'Create a Personal Locker?',
+										arrow = true,
+										event = 'SickEvidence:confirmLocker',
+										args = {selection = 'confirm', inventory = lockerID}
+									},
+									{
+										title = 'Cancel Creation?',
+										description = 'Cancel The Creation of this Personal Locker?',
+										arrow = true,
+										event = 'SickEvidence:confirmLocker',
+										args = {selection = 'cancel'}
+									}
+								}
+							})
+							exports.lation_ui:showMenu('lockerCreate')
+						end
+					else
+						if Config.Menus == 'ox' then
+							lib.registerContext({
+								id = 'lockerOption',
+								title = 'Confirm or Cancel',
+								options = {
+									{
+										title = 'Locker Options',
+										description = 'Locker Delete/Open'
+									},
+									{
+										title = 'Open Locker?',
+										description = 'Open a Personal Locker?',
+										arrow = true,
+										event = 'SickEvidence:lockerOptions',
+										args = {
+											selection = 'open',
+											inventory = lockerID
+										},
+										metadata = {
+											{label = lockerID}
+										}
+									},
+									{
+										title = 'Delete Locker?',
+										description = 'Delete Your Personal Locker?',
+										arrow = true,
+										event = 'SickEvidence:confirmorcancel',
+										args = {
+											selection = "delete",
+											inventory = lockerID
+										}
+									}
 								},
-								{
-									title = 'Cancel Creation?',
-									description = 'Cancel The Creation of this Personal Locker?',
-									arrow = true,
-									event = 'SickEvidence:confirmLocker',
-									args = {selection = 'cancel'}
+							})
+
+							lib.showContext('lockerOption')
+						elseif Config.Menus == 'lation' then
+							exports.lation_ui:registerMenu({
+								id = 'lockerOption',
+								title = 'Confirm or Cancel',
+								options = {
+									{
+										title = 'Locker Options',
+										description = 'Locker Delete/Open'
+									},
+									{
+										title = 'Open Locker?',
+										description = 'Open a Personal Locker?',
+										arrow = true,
+										event = 'SickEvidence:lockerOptions',
+										args = {
+											selection = 'open',
+											inventory = lockerID
+										},
+										metadata = {
+											{label = "Locker: ", value = lockerID}
+										}
+									},
+									{
+										title = 'Delete Locker?',
+										description = 'Delete Your Personal Locker?',
+										arrow = true,
+										event = 'SickEvidence:confirmorcancel',
+										args = {
+											selection = "delete",
+											inventory = lockerID
+										}
+									}
+								}
+							})
+							exports.lation_ui:showMenu('lockerOption')
+						end
+					end
+				end, lockerID)
+			else
+				Notify(3, "Lockers", "Info can\'t be found!")
+			end
+
+		end)
+	elseif Config.Framework == 'QBCore' then
+		Core.Functions.TriggerCallback('SickEvidence:getPlayerName', function(data)
+			if data then
+				local lockerID = ("LEO: "..data.firstname.." "..data.lastname)
+				if Config.inventory == 'qb' or Config.inventory == 'qs' then
+					TriggerServerEvent('SickLockers:OpenInvQB', lockerID)
+				elseif Config.inventory == 'ox' then
+					Core.Functions.TriggerCallback('SickEvidence:getLocker', function(locker)
+						if locker then
+							if Config.Menus == 'ox' then
+								lib.registerContext({
+									id = 'lockerCreate',
+									title = 'Confirm or Cancel',
+									menu = 'openInventory',
+									options = {
+										{
+											title = 'Create New Locker?',
+											description = 'Locker Inventory System'
+										},
+										{
+											title = 'Confirm Creation?',
+											description = 'Create a Personal Locker?',
+											arrow = true,
+											event = 'SickEvidence:confirmLocker',
+											args = {selection = 'confirm', inventory = lockerID}
+										},
+										{
+											title = 'Cancel Creation?',
+											description = 'Cancel The Creation of this Personal Locker?',
+											arrow = true,
+											event = 'SickEvidence:confirmLocker',
+											args = {selection = 'cancel'}
+										}
+									},
+								})
+
+								lib.showContext('lockerCreate')
+							elseif Config.Menus == 'lation' then
+								exports.lation_ui:registerMenu({
+									id = 'lockerCreate',
+									title = 'Confirm or Cancel',
+									menu = 'openInventory',
+									options = {
+										{
+											title = 'Create New Locker?',
+											description = 'Locker Inventory System'
+										},
+										{
+											title = 'Confirm Creation?',
+											description = 'Create a Personal Locker?',
+											arrow = true,
+											event = 'SickEvidence:confirmLocker',
+											args = {selection = 'confirm', inventory = lockerID}
+										},
+										{
+											title = 'Cancel Creation?',
+											description = 'Cancel The Creation of this Personal Locker?',
+											arrow = true,
+											event = 'SickEvidence:confirmLocker',
+											args = {selection = 'cancel'}
+										}
+									}
+								})
+								exports.lation_ui:showMenu('lockerCreate')
+							end
+						else
+							if Config.Menus == 'ox' then
+								lib.registerContext({
+									id = 'lockerOption',
+									title = 'Confirm or Cancel',
+									options = {
+										{
+											title = 'Locker Options',
+											description = 'Locker Delete/Open'
+										},
+										{
+											title = 'Open Locker?',
+											description = 'Open a Personal Locker?',
+											arrow = true,
+											event = 'SickEvidence:lockerOptions',
+											args = {
+												selection = 'open',
+												inventory = lockerID
+											},
+											metadata = {
+												{label = lockerID}
+											}
+										},
+										{
+											title = 'Delete Locker?',
+											description = 'Delete Your Personal Locker?',
+											arrow = true,
+											event = 'SickEvidence:confirmorcancel',
+											args = {
+												selection = "delete",
+												inventory = lockerID
+											}
+										}
+									},
+								})
+
+								lib.showContext('lockerOption')
+							elseif Config.Menus == 'lation' then
+								exports.lation_ui:registerMenu({
+									id = 'lockerOption',
+									title = 'Confirm or Cancel',
+									menu = 'openInventory',
+									options = {
+										{
+											title = 'Locker Options',
+											description = 'Locker Delete/Open'
+										},
+										{
+											title = 'Open Locker?',
+											description = 'Open a Personal Locker?',
+											arrow = true,
+											event = 'SickEvidence:lockerOptions',
+											args = {
+												selection = 'open',
+												inventory = lockerID
+											},
+											metadata = {
+												{label = "Locker: ", value = lockerID}
+											}
+										},
+										{
+											title = 'Delete Locker?',
+											description = 'Delete Your Personal Locker?',
+											arrow = true,
+											event = 'SickEvidence:confirmorcancel',
+											args = {
+												selection = "delete",
+												inventory = lockerID
+											}
+										}
+									}
+								})
+								exports.lation_ui:showMenu('lockerOption')
+							end
+						end
+					end, lockerID)
+				end
+			else
+				Notify(3, "Lockers", "Info can\'t be found!")
+			end
+		end)
+	end
+end)
+
+
+--- CHIEF SHIT ---
+RegisterNetEvent('SickEvidence:ChiefMenu')
+AddEventHandler('SickEvidence:ChiefMenu', function()
+	if Config.Menus == 'ox' then
+		lib.showContext('chooseOption')
+	elseif Config.Menus == 'lation' then
+		exports.lation_ui:showMenu('chooseOption')
+	end
+end)
+
+if Config.Menus == 'ox' then
+	lib.registerContext({
+		id = 'chooseOption',
+		title = 'Options...',
+		options = {
+			{
+				title = 'Choose Option',
+				description = 'Pick an Option below for Locker/Evidence Opening!'
+			},
+			{
+				title = 'Open Locker?',
+				description = 'Open a Personal Locker?',
+				arrow = true,
+				event = 'SickEvidence:ChiefLookup',
+			},
+			{
+				title = 'Open Case?',
+				description = 'Open an Evidence Storage?',
+				arrow = true,
+				event = 'SickEvidence:ChiefCaseMenu',
+			}
+		},
+	})
+elseif Config.Menus == 'lation' then
+
+	exports.lation_ui:registerMenu({
+		id = 'chooseOption',
+		title = 'Options...',
+		options = {
+			{
+				title = 'Choose Option',
+				description = 'Pick an Option below for Locker/Evidence Opening!'
+			},
+			{
+				title = 'Open Locker?',
+				description = 'Open a Personal Locker?',
+				arrow = true,
+				event = 'SickEvidence:ChiefLookup',
+			},
+			{
+				title = 'Open Case?',
+				description = 'Open an Evidence Storage?',
+				arrow = true,
+				event = 'SickEvidence:ChiefCaseMenu',
+			}
+		}
+	})
+end
+
+local function ChooseOption()
+	lib.showContext('chooseOption')
+end
+
+RegisterNetEvent('SickEvidence:ChiefLookup')
+AddEventHandler('SickEvidence:ChiefLookup', function()
+	if Config.Menus == 'ox' then
+		local input = lib.inputDialog('Police locker', {'First Name', 'Last Name'})
+
+		if not input then
+			lib.hideContext(false)
+			return
+		end
+		local lockerID = ("LEO: "..input[1].. " "..input[2])
+		if Config.Framework == 'ESX' then
+			Core.TriggerServerCallback('SickEvidence:getInventory', function(exists)
+				if exists then
+					lib.registerContext({
+						id = 'lockerOption',
+						title = 'Confirm or Cancel',
+						options = {
+							{
+								title = 'Locker Options',
+								description = 'Locker Delete/Open'
+							},
+							{
+								title = 'Open Locker?',
+								description = 'Open a Personal Locker?',
+								arrow = true,
+								event = 'SickEvidence:lockerOptions',
+								args = {
+									selection = 'open',
+									inventory = lockerID
+								},
+								metadata = {
+									{label = lockerID}
 								}
 							},
-						})
+							{
+								title = 'Delete Locker?',
+								description = 'Delete Your Personal Locker?',
+								arrow = true,
+								event = 'SickEvidence:confirmorcancel',
+								args = {
+									selection = "delete",
+									inventory = lockerID
+								}
+							}
+						},
+					})
 
-						lib.showContext('lockerCreate')
-					else
+					lib.showContext('lockerOption')
+				else
+					Notify(3, "Lockers", string.format('No Lockers with name: '..lockerID))
+				end
+			end, lockerID)
+		elseif Config.Framework == 'QBCore' then
+			if Config.inventory == 'qb' or Config.inventory == 'qs' then
+				TriggerServerEvent('SickLockers:OpenInvQB', lockerID)
+			elseif Config.inventory == 'ox' then
+				Core.Functions.TriggerCallback('SickEvidence:getInventory', function(exists)
+					if exists then
 						lib.registerContext({
 							id = 'lockerOption',
 							title = 'Confirm or Cancel',
@@ -772,189 +1463,48 @@ AddEventHandler('SickEvidence:lockerCallbackEvent', function()
 						})
 
 						lib.showContext('lockerOption')
+					else
+						Notify(3, "Lockers", string.format('No Lockers with name: '..lockerID))
 					end
 				end, lockerID)
-			else
-				Notify(3, "Lockers", "Info can\'t be found!")
 			end
-
-		end)
-	elseif Config.Framework == 'QBCore' then
-		Core.Functions.TriggerCallback('SickEvidence:getPlayerName', function(data)
-			if data then
-				local lockerID = ("LEO: "..data.firstname.." "..data.lastname)
-				if Config.inventory == 'qb' or Config.inventory == 'qs' then
-					TriggerServerEvent('SickLockers:OpenInvQB', lockerID)
-				elseif Config.inventory == 'ox' then
-					Core.Functions.TriggerCallback('SickEvidence:getLocker', function(locker)
-						if locker then
-							lib.registerContext({
-								id = 'lockerCreate',
-								title = 'Confirm or Cancel',
-								menu = 'openInventory',
-								options = {
-									{
-										title = 'Create New Locker?',
-										description = 'Locker Inventory System'
-									},
-									{
-										title = 'Confirm Creation?',
-										description = 'Create a Personal Locker?',
-										arrow = true,
-										event = 'SickEvidence:confirmLocker',
-										args = {selection = 'confirm', inventory = lockerID}
-									},
-									{
-										title = 'Cancel Creation?',
-										description = 'Cancel The Creation of this Personal Locker?',
-										arrow = true,
-										event = 'SickEvidence:confirmLocker',
-										args = {selection = 'cancel'}
-									}
-								},
-							})
-			
-							lib.showContext('lockerCreate')
-						else
-							lib.registerContext({
-								id = 'lockerOption',
-								title = 'Confirm or Cancel',
-								options = {
-									{
-										title = 'Locker Options',
-										description = 'Locker Delete/Open'
-									},
-									{
-										title = 'Open Locker?',
-										description = 'Open a Personal Locker?',
-										arrow = true,
-										event = 'SickEvidence:lockerOptions',
-										args = {
-											selection = 'open',
-											inventory = lockerID
-										},
-										metadata = {
-											{label = lockerID}
-										}
-									},
-									{
-										title = 'Delete Locker?',
-										description = 'Delete Your Personal Locker?',
-										arrow = true,
-										event = 'SickEvidence:confirmorcancel',
-										args = {
-											selection = "delete",
-											inventory = lockerID
-										}
-									}
-								},
-							})
-			
-							lib.showContext('lockerOption')
-						end
-					end, lockerID)
-				end
-			else
-				Notify(3, "Lockers", "Info can\'t be found!")
-			end
-		end)
-	end
-end)
-
-
---- CHIEF SHIT ---
-RegisterNetEvent('SickEvidence:ChiefMenu')
-AddEventHandler('SickEvidence:ChiefMenu', function()
-	lib.showContext('chooseOption')
-end)
-
-lib.registerContext({
-	id = 'chooseOption',
-	title = 'Options...',
-	options = {
-		{
-			title = 'Choose Option',
-			description = 'Pick an Option below for Locker/Evidence Opening!'
-		},
-		{
-			title = 'Open Locker?',
-			description = 'Open a Personal Locker?',
-			arrow = true,
-			event = 'SickEvidence:ChiefLookup',
-		},
-		{
-			title = 'Open Case?',
-			description = 'Open an Evidence Storage?',
-			arrow = true,
-			event = 'SickEvidence:ChiefCaseMenu',
-		}
-	},
-})
-
-local function ChooseOption()
-	lib.showContext('chooseOption')
-end
-
-RegisterNetEvent('SickEvidence:ChiefLookup')
-AddEventHandler('SickEvidence:ChiefLookup', function()
-	local input = lib.inputDialog('Police locker', {'First Name', 'Last Name'})
-
-	if not input then
-		lib.hideContext(false)
-		return
-	end
-	local lockerID = ("LEO: "..input[1].. " "..input[2])
-	if Config.Framework == 'ESX' then
-		Core.TriggerServerCallback('SickEvidence:getInventory', function(exists)
-			if exists then
-				lib.registerContext({
-					id = 'lockerOption',
-					title = 'Confirm or Cancel',
-					options = {
-						{
-							title = 'Locker Options',
-							description = 'Locker Delete/Open'
-						},
-						{
-							title = 'Open Locker?',
-							description = 'Open a Personal Locker?',
-							arrow = true,
-							event = 'SickEvidence:lockerOptions',
-							args = {
-								selection = 'open',
-								inventory = lockerID
-							},
-							metadata = {
-								{label = lockerID}
-							}
-						},
-						{
-							title = 'Delete Locker?',
-							description = 'Delete Your Personal Locker?',
-							arrow = true,
-							event = 'SickEvidence:confirmorcancel',
-							args = {
-								selection = "delete",
-								inventory = lockerID
-							}
-						}
-					},
-				})
-		
-				lib.showContext('lockerOption')
-			else
-				Notify(3, "Lockers", string.format('No Lockers with name: '..lockerID))
-			end
-		end, lockerID)
-	elseif Config.Framework == 'QBCore' then
-		if Config.inventory == 'qb' or Config.inventory == 'qs' then
-			TriggerServerEvent('SickLockers:OpenInvQB', lockerID)
-		elseif Config.inventory == 'ox' then
-			Core.Functions.TriggerCallback('SickEvidence:getInventory', function(exists)
+		end
+	elseif Config.Menus == 'lation' then
+		local input = exports.lation_ui:input({
+			title = "Police locker'",
+			subtitle = "Enter your information",
+			submitText = "Save",
+			options = {
+				{
+					type = 'input',
+					label = 'First Name',
+					description = 'Input your First Name below',
+					placeholder = 'Jack',
+					icon = 'fas fa-user',
+					required = true
+				},
+				{
+					type = 'input',
+					label = 'Last Name',
+					description = 'Input your Last Name below',
+					placeholder = 'Napier',
+					icon = 'fas fa-user',
+					required = true
+				},
+			}
+		})
+		if not input then
+			exports.lation_ui:hideText()
+			return
+		end
+		local lockerID = ("LEO: "..input[1].. " "..input[2])
+		if Config.Framework == 'ESX' then
+			Core.TriggerServerCallback('SickEvidence:getInventory', function(exists)
 				if exists then
-					lib.registerContext({
+					exports.lation_ui:registerMenu({
 						id = 'lockerOption',
 						title = 'Confirm or Cancel',
+						menu = 'openInventory',
 						options = {
 							{
 								title = 'Locker Options',
@@ -970,7 +1520,7 @@ AddEventHandler('SickEvidence:ChiefLookup', function()
 									inventory = lockerID
 								},
 								metadata = {
-									{label = lockerID}
+									{label = "Locker: ", value = lockerID}
 								}
 							},
 							{
@@ -983,101 +1533,232 @@ AddEventHandler('SickEvidence:ChiefLookup', function()
 									inventory = lockerID
 								}
 							}
-						},
+						}
 					})
-			
-					lib.showContext('lockerOption')
+					exports.lation_ui:showMenu('lockerOption')
 				else
 					Notify(3, "Lockers", string.format('No Lockers with name: '..lockerID))
 				end
 			end, lockerID)
+		elseif Config.Framework == 'QBCore' then
+			if Config.inventory == 'qb' or Config.inventory == 'qs' then
+				TriggerServerEvent('SickLockers:OpenInvQB', lockerID)
+			elseif Config.inventory == 'ox' then
+				Core.Functions.TriggerCallback('SickEvidence:getInventory', function(exists)
+					if exists then
+						exports.lation_ui:registerMenu({
+							id = 'lockerOption',
+							title = 'Confirm or Cancel',
+							menu = 'openInventory',
+							options = {
+								{
+									title = 'Locker Options',
+									description = 'Locker Delete/Open'
+								},
+								{
+									title = 'Open Locker?',
+									description = 'Open a Personal Locker?',
+									arrow = true,
+									event = 'SickEvidence:lockerOptions',
+									args = {
+										selection = 'open',
+										inventory = lockerID
+									},
+									metadata = {
+										{label = "Locker: ", value = lockerID}
+									}
+								},
+								{
+									title = 'Delete Locker?',
+									description = 'Delete Your Personal Locker?',
+									arrow = true,
+									event = 'SickEvidence:confirmorcancel',
+									args = {
+										selection = "delete",
+										inventory = lockerID
+									}
+								}
+							}
+						})
+						exports.lation_ui:showMenu('lockerOption')
+					else
+						Notify(3, "Lockers", string.format('No Lockers with name: '..lockerID))
+					end
+				end, lockerID)
+			end
 		end
 	end
 end)
 
 RegisterNetEvent('SickEvidence:ChiefCaseMenu')
 AddEventHandler('SickEvidence:ChiefCaseMenu', function()
-	local input = lib.inputDialog('LSPD Cases', {'Enter Case#'})
+	if Config.Menus == 'ox' then
+		local input = lib.inputDialog('LSPD Cases', {'Enter Case#'})
 
-	if not input then
-		lib.hideContext(false)
-		return
-	end
-	local evidenceID = ("Case: "..input[1])
-	if Config.Framework == 'ESX' then
-		Core.TriggerServerCallback('SickEvidence:getInventory', function(exists)
-			if exists then
-				lib.registerContext({
-					id = 'evidenceOption',
-					title = 'Evidence Options',
-					options = {
-						{
-							title = 'Evidence Delete/Open'
-						},
-						{
-							title = 'Open Evidence?',
-							description = 'Open Evidence Storage?',
-							arrow = true,
-							event = 'SickEvidence:evidenceOptions',
-							args = {
-								selection = "open",
-								inventory = evidenceID
+		if not input then
+			lib.hideContext(false)
+			return
+		end
+		local evidenceID = ("Case: "..input[1])
+		if Config.Framework == 'ESX' then
+			Core.TriggerServerCallback('SickEvidence:getInventory', function(exists)
+				if exists then
+					lib.registerContext({
+						id = 'evidenceOption',
+						title = 'Evidence Options',
+						options = {
+							{
+								title = 'Evidence Delete/Open'
+							},
+							{
+								title = 'Open Evidence?',
+								description = 'Open Evidence Storage?',
+								arrow = true,
+								event = 'SickEvidence:evidenceOptions',
+								args = {
+									selection = "open",
+									inventory = evidenceID
+								}
+							},
+							{
+								title = 'Delete Inventory?',
+								description = 'Delete this Evidence Storage?',
+								arrow = true,
+								event = 'SickEvidence:evidenceOptions',
+								args = {
+									selection = "delete",
+									inventory = evidenceID
+								}
 							}
 						},
-						{
-							title = 'Delete Inventory?',
-							description = 'Delete this Evidence Storage?',
-							arrow = true,
-							event = 'SickEvidence:evidenceOptions',
-							args = {
-								selection = "delete",
-								inventory = evidenceID
+					})
+					lib.showContext('evidenceOption')
+				else
+					Notify(3, "Lockers", string.format('No Evidence Storages with name: '..evidenceID))
+				end
+			end, evidenceID)
+		elseif Config.Framework == 'QBCore' then
+			Core.Functions.TriggerCallback('SickEvidence:getInventory', function(exists)
+				if exists then
+					lib.registerContext({
+						id = 'evidenceOption',
+						title = 'Evidence Options',
+						options = {
+							{
+								title = 'Evidence Delete/Open'
+							},
+							{
+								title = 'Open Evidence?',
+								description = 'Open Evidence Storage?',
+								arrow = true,
+								event = 'SickEvidence:evidenceOptions',
+								args = {
+									selection = "open",
+									inventory = evidenceID
+								}
+							},
+							{
+								title = 'Delete Inventory?',
+								description = 'Delete this Evidence Storage?',
+								arrow = true,
+								event = 'SickEvidence:evidenceOptions',
+								args = {
+									selection = "delete",
+									inventory = evidenceID
+								}
+							}
+						},
+					})
+					lib.showContext('evidenceOption')
+				else
+					Notify(3, "Lockers", string.format('No Evidence Storages with name: '..evidenceID))
+				end
+			end, evidenceID)
+		end
+	elseif Config.Menus == 'lation' then
+		local input = lib.inputDialog('LSPD Cases', {'Enter Case#'})
+
+		if not input then
+			lib.hideContext(false)
+			return
+		end
+		local evidenceID = ("Case: "..input[1])
+		if Config.Framework == 'ESX' then
+			Core.TriggerServerCallback('SickEvidence:getInventory', function(exists)
+				if exists then
+					exports.lation_ui:registerMenu({
+						id = 'evidenceOption',
+						title = 'Confirm or Cancel',
+						options = {
+							{
+								title = 'Evidence Delete/Open'
+							},
+							{
+								title = 'Open Evidence?',
+								description = 'Open Evidence Storage?',
+								arrow = true,
+								event = 'SickEvidence:evidenceOptions',
+								args = {
+									selection = "open",
+									inventory = evidenceID
+								}
+							},
+							{
+								title = 'Delete Inventory?',
+								description = 'Delete this Evidence Storage?',
+								arrow = true,
+								event = 'SickEvidence:evidenceOptions',
+								args = {
+									selection = "delete",
+									inventory = evidenceID
+								}
 							}
 						}
-					},
-				})
-				lib.showContext('evidenceOption')
-			else
-				Notify(3, "Lockers", string.format('No Evidence Storages with name: '..evidenceID))
-			end
-		end, evidenceID)
-	elseif Config.Framework == 'QBCore' then
-		Core.Functions.TriggerCallback('SickEvidence:getInventory', function(exists)
-			if exists then
-				lib.registerContext({
-					id = 'evidenceOption',
-					title = 'Evidence Options',
-					options = {
-						{
-							title = 'Evidence Delete/Open'
-						},
-						{
-							title = 'Open Evidence?',
-							description = 'Open Evidence Storage?',
-							arrow = true,
-							event = 'SickEvidence:evidenceOptions',
-							args = {
-								selection = "open",
-								inventory = evidenceID
-							}
-						},
-						{
-							title = 'Delete Inventory?',
-							description = 'Delete this Evidence Storage?',
-							arrow = true,
-							event = 'SickEvidence:evidenceOptions',
-							args = {
-								selection = "delete",
-								inventory = evidenceID
+					})
+					exports.lation_ui:showMenu('evidenceOption')
+				else
+					Notify(3, "Lockers", string.format('No Evidence Storages with name: '..evidenceID))
+				end
+			end, evidenceID)
+		elseif Config.Framework == 'QBCore' then
+			Core.Functions.TriggerCallback('SickEvidence:getInventory', function(exists)
+				if exists then
+					exports.lation_ui:registerMenu({
+						id = 'evidenceOption',
+						title = 'Confirm or Cancel',
+						menu = 'openInventory',
+						options = {
+							{
+								title = 'Evidence Delete/Open'
+							},
+							{
+								title = 'Open Evidence?',
+								description = 'Open Evidence Storage?',
+								arrow = true,
+								event = 'SickEvidence:evidenceOptions',
+								args = {
+									selection = "open",
+									inventory = evidenceID
+								}
+							},
+							{
+								title = 'Delete Inventory?',
+								description = 'Delete this Evidence Storage?',
+								arrow = true,
+								event = 'SickEvidence:evidenceOptions',
+								args = {
+									selection = "delete",
+									inventory = evidenceID
+								}
 							}
 						}
-					},
-				})
-				lib.showContext('evidenceOption')
-			else
-				Notify(3, "Lockers", string.format('No Evidence Storages with name: '..evidenceID))
-			end
-		end, evidenceID)
+					})
+					exports.lation_ui:showMenu('evidenceOption')
+				else
+					Notify(3, "Lockers", string.format('No Evidence Storages with name: '..evidenceID))
+				end
+			end, evidenceID)
+		end
 	end
 end)
 
@@ -1117,19 +1798,33 @@ AddEventHandler('SickEvidence:ChieflockerOptions', function(args)
 end)
 
 ----NEW JOBS---
-
-lib.registerContext({
-	id = 'other_lockers',
-	title = 'Personal Lockers!',
-	options = {
-		{
-			title = 'Open Locker Room',
-			description = 'Open Locker Room',
-			arrow = true,
-			event = 'SickEvidence:OtherlockerCallbackEvent',
+if Config.Menus == 'ox' then
+	lib.registerContext({
+		id = 'other_lockers',
+		title = 'Personal Lockers!',
+		options = {
+			{
+				title = 'Open Locker Room',
+				description = 'Open Locker Room',
+				arrow = true,
+				event = 'SickEvidence:OtherlockerCallbackEvent',
+			}
+		},
+	})
+elseif Config.Menus == 'lation' then
+	exports.lation_ui:registerMenu({
+		id = 'evidenceOption',
+		title = 'Confirm or Cancel',
+		options = {
+			{
+				title = 'Open Locker Room',
+				description = 'Open Locker Room',
+				arrow = true,
+				event = 'SickEvidence:OtherlockerCallbackEvent',
+			}
 		}
-	},
-})
+	})
+end
 
 RegisterNetEvent('SickEvidence:OtherlockerOptions')
 AddEventHandler('SickEvidence:OtherlockerOptions', function(args)
@@ -1153,65 +1848,128 @@ AddEventHandler('SickEvidence:OtherlockerCallbackEvent', function()
 				local OtherlockerID = (PlayerData.job.name.. ": " ..data.firstname.." "..data.lastname)
 				Core.TriggerServerCallback('SickEvidence:getOtherInventories', function(Otherlocker)
 					if Otherlocker then
-						lib.registerContext({
-							id = 'Other_lockerOption',
-							title = 'Confirm or Cancel',
-							options = {
-								{
-									title = 'Locker Options',
-									description = 'Locker Delete/Open'
-								},
-								{
-									title = 'Open Locker?',
-									description = 'Open a Personal Locker?',
-									arrow = true,
-									event = 'SickEvidence:OtherlockerOptions',
-									args = {
-										selection = 'open',
-										inventory = OtherlockerID
+						if Conifg.Menus == 'ox' then
+							lib.registerContext({
+								id = 'Other_lockerOption',
+								title = 'Confirm or Cancel',
+								options = {
+									{
+										title = 'Locker Options',
+										description = 'Locker Delete/Open'
+									},
+									{
+										title = 'Open Locker?',
+										description = 'Open a Personal Locker?',
+										arrow = true,
+										event = 'SickEvidence:OtherlockerOptions',
+										args = {
+											selection = 'open',
+											inventory = OtherlockerID
+										}
+									},
+									{
+										title = 'Delete Locker?',
+										description = 'Delete Your Personal Locker?',
+										arrow = true,
+										event = 'SickEvidence:confirmorcancel',
+										args = {
+											selection = "delete",
+											inventory = OtherlockerID
+										}
 									}
 								},
-								{
-									title = 'Delete Locker?',
-									description = 'Delete Your Personal Locker?',
-									arrow = true,
-									event = 'SickEvidence:confirmorcancel',
-									args = {
-										selection = "delete",
-										inventory = OtherlockerID
+							})
+
+							lib.showContext('Other_lockerOption')
+						elseif Config.Menus == 'lation' then
+							exports.lation_ui:registerMenu({
+								id = 'Other_lockerOption',
+								title = 'Confirm or Cancel',
+								options = {
+									{
+										title = 'Locker Options',
+										description = 'Locker Delete/Open'
+									},
+									{
+										title = 'Open Locker?',
+										description = 'Open a Personal Locker?',
+										arrow = true,
+										event = 'SickEvidence:OtherlockerOptions',
+										args = {
+											selection = 'open',
+											inventory = OtherlockerID
+										}
+									},
+									{
+										title = 'Delete Locker?',
+										description = 'Delete Your Personal Locker?',
+										arrow = true,
+										event = 'SickEvidence:confirmorcancel',
+										args = {
+											selection = "delete",
+											inventory = OtherlockerID
+										}
 									}
 								}
-							},
-						})
-		
-						lib.showContext('Other_lockerOption')
+							})
+							exports.lation_ui:showMenu('Other_lockerOption')
+						end
+
 					else
-						lib.registerContext({
-							id = 'Other_lockerCreate',
-							title = 'Confirm or Cancel',
-							options = {
-								{
-									title = 'Create New Locker?',
-									description = 'Locker Inventory System'
+						if Config.Menus == 'ox' then
+							lib.registerContext({
+								id = 'Other_lockerCreate',
+								title = 'Confirm or Cancel',
+								options = {
+									{
+										title = 'Create New Locker?',
+										description = 'Locker Inventory System'
+									},
+									{
+										title = 'Confirm Creation?',
+										description = 'Create a Personal Locker?',
+										arrow = true,
+										event = 'SickEvidence:confirmorcancelOthers',
+										args = {selection = 'confirm', inventory = OtherlockerID}
+									},
+									{
+										title = 'Cancel Creation?',
+										description = 'Cancel The Creation of this Personal Locker?',
+										arrow = true,
+										event = 'SickEvidence:confirmorcancelOthers',
+										args = {selection = 'cancel'}
+									}
 								},
-								{
-									title = 'Confirm Creation?',
-									description = 'Create a Personal Locker?',
-									arrow = true,
-									event = 'SickEvidence:confirmorcancelOthers',
-									args = {selection = 'confirm', inventory = OtherlockerID}
-								},
-								{
-									title = 'Cancel Creation?',
-									description = 'Cancel The Creation of this Personal Locker?',
-									arrow = true,
-									event = 'SickEvidence:confirmorcancelOthers',
-									args = {selection = 'cancel'}
+							})
+
+							lib.showContext('Other_lockerCreate')
+						elseif Config.Menus == 'lation' then
+							exports.lation_ui:registerMenu({
+								id = 'Other_lockerCreate',
+								title = 'Confirm or Cancel',
+								options = {
+									{
+										title = 'Create New Locker?',
+										description = 'Locker Inventory System'
+									},
+									{
+										title = 'Confirm Creation?',
+										description = 'Create a Personal Locker?',
+										arrow = true,
+										event = 'SickEvidence:confirmorcancelOthers',
+										args = {selection = 'confirm', inventory = OtherlockerID}
+									},
+									{
+										title = 'Cancel Creation?',
+										description = 'Cancel The Creation of this Personal Locker?',
+										arrow = true,
+										event = 'SickEvidence:confirmorcancelOthers',
+										args = {selection = 'cancel'}
+									}
 								}
-							},
-						})
-		
-						lib.showContext('Other_lockerCreate')
+							})
+							exports.lation_ui:showMenu('Other_lockerCreate')
+						end
 					end
 				end, OtherlockerID)
 			else
@@ -1258,7 +2016,7 @@ AddEventHandler('SickEvidence:OtherlockerCallbackEvent', function()
 									}
 								},
 							})
-			
+
 							lib.showContext('Other_lockerOption')
 						else
 							lib.registerContext({
@@ -1285,7 +2043,7 @@ AddEventHandler('SickEvidence:OtherlockerCallbackEvent', function()
 									}
 								},
 							})
-			
+
 							lib.showContext('Other_lockerCreate')
 						end
 					end, OtherlockerID)

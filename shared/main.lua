@@ -4,6 +4,8 @@ Config.Target = 'ox_target' -- 'ox_target', 'qtarget', 'qb-target'
 Config.SickDirtyCopsHeist = false
 Config.inventory = 'ox' -- 'ox' or 'qs' or 'qb'
 
+Config.Menus = 'lation' -- 'ox' or 'lation'
+
 Config.PoliceJobs = {
     ['police'] = true
 }
@@ -56,5 +58,5 @@ Config.GangLocations = {
 }
 
 Config.NotificationType = {
-    client = 'ox_libs'
+    client = 'ox_libs' -- 'ox_libs' or 'lation'
 }
